@@ -1,0 +1,9 @@
+{
+    "COMMAND_PING_NAME": "ping",
+    "COMMAND_PING_DESCRIPTION": "Checks the bot's latency and API response time.",
+    "COMMAND_PING_RESPONSE": "🏓 **Pong!**\n> API Latency: {apiLatency}ms\n> Bot Latency: {botLatency}ms",
+
+
+    "ERROR_GENERIC": "An unexpected error occurred. Please try again.",
+    "COOLDOWN": "You must wait {seconds}s before using `/{commandName}` command again."
+}
