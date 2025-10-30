@@ -23,7 +23,7 @@ export default class ShutdownCommand extends Command {
         Logger.info(`Shutting down gracefully...\n- Ordered by ${interaction.user.displayName} (${interaction.user.id}) in ${interaction.guild!.name} (${interaction.guildId}) on ${new Date().toLocaleString('en-GB')}`);
 
         await interaction.reply({
-            content: 'Shutting down...',
+            content: 'Shutting down...\n**NOTE: Will restart automatically if in production.**',
             flags: MessageFlags.Ephemeral
         });
 

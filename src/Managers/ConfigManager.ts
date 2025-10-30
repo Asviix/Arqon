@@ -1,7 +1,7 @@
 // src\Managers\ConfigManager.ts
 
 import { BotClient } from "../Client/BotClient";
-import { GuildConfig } from "../Database/MySQLClient";
+import { GuildConfig } from '../Database/MySQLClient';
 import { MySQLClient } from "../Database/MySQLClient";
 
 /**
@@ -25,17 +25,12 @@ export class ConfigManager {
     public async getCachedGuildConfig(guildId: string): Promise<GuildConfig> {
         const cachedConfig = this.client.guildConfigs.get(guildId);
 
-        if (cachedConfig) {
-            return cachedConfig;
+        if (!cachedConfig) {
+            const newConfig = await this.db.initializeGuildConfig(guildId);
+            this.client.guildConfigs.set(guildId, newConfig);
+            return newConfig;
         };
 
-        const fetchedGuildConfig = await this.db.getGuildConfig(guildId);
-
-        if (!fetchedGuildConfig) {
-            await this.db.initializeGuildConfig(guildId);
-        };
-        this.client.guildConfigs.set(guildId, fetchedGuildConfig as GuildConfig);
-
-        return fetchedGuildConfig as GuildConfig;
+        return cachedConfig;
     };
 };

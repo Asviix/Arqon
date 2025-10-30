@@ -13,13 +13,6 @@ export default class InteractionCreateEvent extends EventHandler {
     public async execute(client: BotClient, interaction: Interaction): Promise<void> {
         let responseText: string;
 
-        try {
-            client.db.ensureGuildConfig(interaction.guildId!);
-        } catch (error) {
-            Logger.error('DB FATAL ERROR:\n', error);
-            return interactionErrorReply('[DATABASE INTERNAL ERROR]', interaction as ChatInputCommandInteraction);
-        };
-
         if (!interaction.isChatInputCommand()) return;
 
         const command = client.commands.get(interaction.commandName);

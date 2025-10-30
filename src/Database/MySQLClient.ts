@@ -33,7 +33,7 @@ export class MySQLClient {
             connectionLimit: 10,
             queueLimit: 0,
         });
-        Logger.success('Database pool created.');
+        Logger.info('Database pool created.');
     };
 
     /**
@@ -87,52 +87,19 @@ export class MySQLClient {
     /**
      * Initializes the database for a newly joined guild.
      * @param guildId The ID of the guild to add.
+     * @returns A GuildConfig object.
      */
-    public async initializeGuildConfig(guildId: string): Promise<void> {
-        await this.setGuildLanguage(guildId, 'en-US');
-    };
-
-    /**
-     * Retrieves the configuration for a specific guild.
-     * @param guildId The ID of the guild to fetch.
-     */
-    public async getGuildConfig(guildId: string): Promise<GuildConfig | null> {
-
-        const [rows] = await this.query<mysql.RowDataPacket[]>(
-            'SELECT * FROM guild_configs WHERE guild_id = ?',
-            [guildId]
-        );
-        
-        if (!rows || rows.length === 0) {
-            return null;
-        };
-
-        return rows as GuildConfig;
-    };
-
-    /**
-     * Ensures a guild configuration exists in the database.
-     * @param guildId The ID of the Guild to check.
-     */
-    public async ensureGuildConfig(guildId: string): Promise<void> {
-        const config = await this.getGuildConfig(guildId);
-        if (config === null) {
-            await this.initializeGuildConfig(guildId);
-        };
-    };
-
-    /**
-     * Sets the language code for a guild (upsert).
-     * @param guildId The ID of the guild to set.
-     */
-    public async setGuildLanguage(guildId: string, languageCode: string): Promise<void> {
+    public async initializeGuildConfig(guildId: string): Promise<GuildConfig> {
         await this.query(
-            `
-            INSERT INTO guild_configs (guild_id, language_code)
-            VALUES (?, ?)
-            ON DUPLICATE KEY UPDATE language_code = VALUES(language_code);
-            `,
-            [guildId, languageCode]
-        );
+            `INSERT INTO guild_configs (guild_id) VALUES (?)`, [guildId]
+        )
+
+        const newConfig: GuildConfig = {
+            guild_id: guildId,
+            language_code: 'en-US',
+            joined_on: new Date().getTime()
+        };
+
+        return newConfig;
     };
 };

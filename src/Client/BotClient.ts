@@ -6,6 +6,7 @@ import { EventHandler } from '../Events/BaseEvent';
 import { LocaleStrings, LocalizationManager } from '../Locales/LocalizationManager';
 import { ConfigManager } from '../Managers/ConfigManager';
 import { MySQLClient, GuildConfig } from '../Database/MySQLClient';
+import { Logger } from '../Utils/Logger';
 
 export class BotClient extends Client {
 
@@ -15,6 +16,7 @@ export class BotClient extends Client {
     public cooldowns: Collection<string, Collection<string, number>> = new Collection();
     public locales: LocaleStrings = {};
     public guildConfigs: Collection<string, GuildConfig> = new Collection();
+    public isProd: Boolean = process.argv.includes('--env=production');
 
     // Classes
     public db!: MySQLClient;
@@ -29,10 +31,13 @@ export class BotClient extends Client {
     };
 
     public async start(token: string) {
+        Logger.debug('Initializing Schema...');
         await this.db.initializeSchema();
 
+        Logger.debug('Loading locales...');
         this.locales = await this.localizationManager.loadLocales();
 
+        Logger.debug('Logging into Discord...')
         await this.login(token);
     };
 };

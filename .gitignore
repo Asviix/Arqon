@@ -7,3 +7,5 @@ package-lock.json
 docker-compose.yml
 Dockerfile
 node_modules/
+dist/
+phpmyadmin/
