@@ -22,10 +22,11 @@ export async function sendLogMessage(client: BotClient): Promise<void> {
         const DEV_DISCORD_LOGS_CHANNEL = DEV_DISCORD_GUILD.channels.cache.get(process.env.DEV_LOGS_CHANNEL as string) as TextChannel;
 
         const statusEmbed = sendLogMessage_Embed({
+            isProd: client.isProd,
             latency: client.ws.ping,
             guild_count: client.guilds.cache.size,
             startupTime: new Date()
-        })
+        });
 
         await DEV_DISCORD_LOGS_CHANNEL.send({
             embeds: [statusEmbed]

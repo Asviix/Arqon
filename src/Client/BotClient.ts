@@ -16,7 +16,7 @@ export class BotClient extends Client {
     public cooldowns: Collection<string, Collection<string, number>> = new Collection();
     public locales: LocaleStrings = {};
     public guildConfigs: Collection<string, GuildConfig> = new Collection();
-    public isProd: Boolean = process.argv.includes('--env=production');
+    public isProd: boolean = process.argv.includes('--env=production');
 
     // Classes
     public db!: MySQLClient;

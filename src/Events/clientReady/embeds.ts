@@ -3,6 +3,7 @@
 import { EmbedBuilder } from "discord.js";
 
 interface sendLogMessage_EmbedData {
+    isProd: boolean,
     latency: number;
     guild_count: number;
     startupTime: Date;
@@ -17,7 +18,7 @@ export function sendLogMessage_Embed(data: sendLogMessage_EmbedData): EmbedBuild
             name: 'Arqon'
         })
         .addFields(
-            { name: `**Envrionment:**`, value: `Production` },
+            { name: `**Envrionment:**`, value: data.isProd ? 'Production' : 'Development' },
             { name: `**Latency**`, value: `${data.latency}ms` },
             { name: `**Total Guilds:**`, value: `${data.guild_count}` }
         )
