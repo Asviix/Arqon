@@ -4,6 +4,7 @@ import { BotClient } from "../Client/BotClient";
 import { GuildConfig } from '../Database/MySQLClient';
 import { MySQLClient } from "../Database/MySQLClient";
 import * as mysql from 'mysql2/promise'
+import { Logger } from "../Utils/Logger";
 
 /**
  * Manages the retrieval of guild-specific configurations,
@@ -52,7 +53,18 @@ export class ConfigManager {
             return rows[0] as GuildConfig;
         };
 
-        return await this.initializeGuildConfig(guildId);
+        try {
+            return await this.initializeGuildConfig(guildId);
+        } catch (error) {
+            Logger.error('CRITICAL DB ERROR!', error);
+            const newConfig: GuildConfig = {
+                guild_id: guildId,
+                language_code: 'en-US',
+                joined_on: new Date().getTime()
+            };
+
+            return newConfig;
+        };
     };
 
     /**

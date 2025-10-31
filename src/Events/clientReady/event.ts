@@ -5,7 +5,7 @@ import { Logger } from '../../Utils/Logger';
 import { BotClient } from '../../Client/BotClient';
 import { EventHandler } from '../BaseEvent';
 import { ActivityType, ApplicationCommandDataResolvable } from 'discord.js';
-import { sendLogMessage, setActivity } from './methods';
+import { logPinMessage, setActivity } from './methods';
 
 export default class ReadyEvent extends EventHandler {
     public name = 'clientReady';
@@ -26,7 +26,7 @@ export default class ReadyEvent extends EventHandler {
 
         setActivity(client, 'Your advanced features!', ActivityType.Watching);
 
-        sendLogMessage(client);
+        logPinMessage(client);
 
         Logger.success(`Bot is online! Logged in as ${client.user.tag}`);
         Logger.info(`Bot Client ID: ${client.application.id}`);
