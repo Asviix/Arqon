@@ -11,7 +11,7 @@ import { ChatInputCommandInteraction, Collection, MessageFlags } from "discord.j
  * @param client The BotClient instance.
  * @returns [boolean, number] - The Boolean is true if the user is in cooldown, The time is 0 if not, otherwise the time remaining.
  */
-export async function isCooldown(userId: string, command: Command, client: BotClient): Promise<[boolean, number]> {
+export async function isCooldown(client: BotClient, userId: string, command: Command): Promise<[boolean, number]> {
     const commandCooldown = command.cooldown;
     const commandName = command.name;
     

@@ -24,12 +24,9 @@ export default class ReadyEvent extends EventHandler {
             Logger.error(`\nError during command registration:\n`, error);
         };
 
-        Logger.debug('Setting activity...');
         setActivity(client, 'Your advanced features!', ActivityType.Watching);
 
-        Logger.info('Sending log message...');
         sendLogMessage(client);
-
 
         Logger.success(`Bot is online! Logged in as ${client.user.tag}`);
         Logger.info(`Bot Client ID: ${client.application.id}`);

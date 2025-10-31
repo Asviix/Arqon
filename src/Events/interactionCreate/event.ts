@@ -30,7 +30,7 @@ export default class InteractionCreateEvent extends EventHandler {
         const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
 
         try {
-            const [userInCooldown, remaining] = await isCooldown(interaction.user.id, command, client);
+            const [userInCooldown, remaining] = await isCooldown(client, interaction.user.id, command);
 
             if (userInCooldown) {
                 responseText = await client.localizationManager.getString(languageCode, 'COOLDOWN', 

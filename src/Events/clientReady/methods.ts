@@ -6,6 +6,7 @@ import { ActivityType, TextChannel } from "discord.js";
 import { sendLogMessage_Embed } from "./embeds";
 
 export async function setActivity(client: BotClient, name: string, type: ActivityType): Promise<void> {
+    Logger.debug('Setting activity...');
     if (client.user) {
         client.user.setActivity({
             name: name,
@@ -17,6 +18,7 @@ export async function setActivity(client: BotClient, name: string, type: Activit
 };
 
 export async function sendLogMessage(client: BotClient): Promise<void> {
+    Logger.info('Creating log message...');
     const DEV_DISCORD_GUILD = await client.guilds.fetch(process.env.DEV_DISCORD_ID as string);
     try {
         const DEV_DISCORD_LOGS_CHANNEL = DEV_DISCORD_GUILD.channels.cache.get(process.env.DEV_LOGS_CHANNEL as string) as TextChannel;
