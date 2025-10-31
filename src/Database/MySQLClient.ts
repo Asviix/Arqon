@@ -83,23 +83,4 @@ export class MySQLClient {
             await sleep(TIMEOUT)
         };
     };
-
-    /**
-     * Initializes the database for a newly joined guild.
-     * @param guildId The ID of the guild to add.
-     * @returns A GuildConfig object.
-     */
-    public async initializeGuildConfig(guildId: string): Promise<GuildConfig> {
-        await this.query(
-            `INSERT INTO guild_configs (guild_id) VALUES (?)`, [guildId]
-        )
-
-        const newConfig: GuildConfig = {
-            guild_id: guildId,
-            language_code: 'en-US',
-            joined_on: new Date().getTime()
-        };
-
-        return newConfig;
-    };
 };

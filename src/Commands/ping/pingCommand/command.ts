@@ -16,19 +16,27 @@ export default class PingCommand extends Command {
      * The main execution logic for the command.
      */
     public async execute(client: BotClient, interaction: ChatInputCommandInteraction, languageCode: string) {
-        const sentTime = interaction.createdTimestamp;
-        const latency = sentTime - Date.now();
 
-        const responseText = await client.localizationManager.getString(languageCode, 'COMMAND_PING_RESPONSE',
-            {
-                'botLatency': latency.toString(),
-                'apiLatency': client.ws.ping.toString()
-            }
-        );
+        const pinging = await interaction.deferReply() // Defer reply
 
-        await interaction.reply({
-            content: responseText,
-            flags: MessageFlags.Ephemeral
+        const ws = interaction.client.ws.ping; // Websocket Ping
+        const msgEdit = pinging.createdTimestamp - Date.now(); // API Latency
+
+        // Uptime
+        let days = Math.floor(interaction.client.uptime / 86400000);
+        let hours = Math.floor(interaction.client.uptime / 3600000) % 24;
+        let minutes = Math.floor(interaction.client.uptime / 60000) % 60;
+        let seconds = Math.floor(interaction.client.uptime / 1000) % 60;
+
+        await pinging.edit({
+            content: await client.localizationManager.getString(languageCode, 'COMMAND_PING_RESPONSE', {
+                'wsping': ws.toString(),
+                'apiLatency': msgEdit.toString(),
+                'days': days.toString(),
+                'hours': hours.toString(),
+                'minutes': minutes.toString(),
+                'seconds': seconds.toString()
+            })
         });
     };
 };

@@ -3,6 +3,7 @@
 import { BotClient } from "../Client/BotClient";
 import { GuildConfig } from '../Database/MySQLClient';
 import { MySQLClient } from "../Database/MySQLClient";
+import * as mysql from 'mysql2/promise'
 
 /**
  * Manages the retrieval of guild-specific configurations,
@@ -18,7 +19,44 @@ export class ConfigManager {
     };
 
     /**
-     * Gets the config of a specific guild.
+     * Initializes the database for a newly joined guild.
+     * @param guildId The ID of the guild to add.
+     * @returns A GuildConfig object.
+     */
+    public async initializeGuildConfig(guildId: string): Promise<GuildConfig> {
+        await this.db.query(
+            `INSERT INTO guild_configs (guild_id) VALUES (?)`, [guildId]
+        )
+
+        const newConfig: GuildConfig = {
+            guild_id: guildId,
+            language_code: 'en-US',
+            joined_on: new Date().getTime()
+        };
+
+        return newConfig;
+    };
+
+    /**
+     * Gets a guild config and initializes it if not present.
+     * @param guildId The ID of the guild to get.
+     * @returns A GuildConfig object.
+     */
+    public async getGuildConfig(guildId: string): Promise<GuildConfig> {
+        const rows = await this.db.query<mysql.RowDataPacket[]>(
+            `SELECT * FROM guild_configs WHERE guild_id = ?`,
+            [guildId]
+        );
+
+        if (rows && rows.length > 0) {
+            return rows[0] as GuildConfig;
+        };
+
+        return await this.initializeGuildConfig(guildId);
+    };
+
+    /**
+     * Gets the cached config of a specific guild and creates it if not there yet.
      * @param guildId The ID of the Guild.
      * @returns A GuildConfig object.
      */
@@ -26,7 +64,7 @@ export class ConfigManager {
         const cachedConfig = this.client.guildConfigs.get(guildId);
 
         if (!cachedConfig) {
-            const newConfig = await this.db.initializeGuildConfig(guildId);
+            const newConfig = await this.getGuildConfig(guildId);
             this.client.guildConfigs.set(guildId, newConfig);
             return newConfig;
         };

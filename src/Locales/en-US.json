@@ -1,7 +1,7 @@
 {
     "COMMAND_PING_NAME": "ping",
     "COMMAND_PING_DESCRIPTION": "Checks the bot's latency and API response time.",
-    "COMMAND_PING_RESPONSE": "🏓 **Pong!**\n> API Latency: {apiLatency}ms\n> Bot Latency: {botLatency}ms",
+    "COMMAND_PING_RESPONSE": "🏓 **Pong!**\n> Websocket Ping: `{wsping}ms`\n> API Latency: `{apiLatency}ms`\n> Uptime: `{days} days, {hours} hours, {minutes} minutes, {seconds} seconds.`",
 
 
     "ERROR_GENERIC": "An unexpected error occurred. Please try again.",
