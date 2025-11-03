@@ -1,0 +1,58 @@
+# docker-compose.yml
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '3306:3306'
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -hdb -u${DB_ROOT_USER} -p${DB_PASSWORD} > /dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+  
+  phpmyadmin:
+    image: linuxserver/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      PUID: 1000
+      PGID: 1000
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${DB_ROOT_USER}
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./phpmyadmin/config:/config
+  
+  app:
+    build: .
+    command: "npm run start"
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/usr/src/app/src
+      - /usr/src/app/node_modules
+
+volumes:
+  dbdata:
