@@ -5,13 +5,15 @@ import { Logger } from '../../Utils/Logger';
 import { BotClient } from '../../Client/BotClient';
 import { EventHandler } from '../BaseEvent';
 import { ActivityType, ApplicationCommandDataResolvable } from 'discord.js';
-import { logPinMessage, setActivity } from './methods';
+import { clientReadyRunMethods } from './methods';
 
 export default class ReadyEvent extends EventHandler {
     public name = 'clientReady';
     public once = true;
 
     public async execute(client: BotClient): Promise<void> {
+        const SYNC_INTERVAL_MS = 5 * 60 * 1000;
+
         if (!client.user || !client.application) return;
 
         const commandData: ApplicationCommandDataResolvable[] = Array.from(client.commands.values()).map(command => command.commandData);
@@ -24,9 +26,11 @@ export default class ReadyEvent extends EventHandler {
             Logger.error(`\nError during command registration:\n`, error);
         };
 
-        setActivity(client, 'Your advanced features!', ActivityType.Watching);
+        await clientReadyRunMethods(client, 'Your advanced features!', ActivityType.Watching);
 
-        logPinMessage(client);
+        setInterval(() => {
+            client.db.syncSessionCounters();
+        }, SYNC_INTERVAL_MS);
 
         Logger.success(`Bot is online! Logged in as ${client.user.tag}`);
         Logger.info(`Bot Client ID: ${client.application.id}`);

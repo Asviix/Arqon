@@ -49,6 +49,7 @@ export class LocalizationManager {
      * @returns A promise resolving to an object mapping locale codes to their strings.
      */
     public async loadLocales(): Promise<LocaleStrings> {
+        Logger.debug('Loading locales...');
         const localesPath = path.join(__dirname);
         const locales: LocaleStrings = {};
 

@@ -27,6 +27,8 @@ export default class ShutdownCommand extends Command {
             flags: MessageFlags.Ephemeral
         });
 
+        await client.db.syncSessionCounters();
+
         client.destroy();
         process.exit(0);
     };

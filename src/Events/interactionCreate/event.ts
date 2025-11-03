@@ -42,12 +42,13 @@ export default class InteractionCreateEvent extends EventHandler {
 
                 return await interactionErrorReply(responseText, interaction);
             };
+            client.sessionCounters.commandsRan += 1;
 
             await command.execute(client, interaction as ChatInputCommandInteraction, languageCode);
         } catch (error) {
-            responseText = await client.localizationManager.getString(languageCode, 'ERROR_GENERIC')
+            responseText = await client.localizationManager.getString(languageCode, 'ERROR_GENERIC');
 
-            interactionErrorReply(responseText, interaction)
+            interactionErrorReply(responseText, interaction);
 
             Logger.error(`Error executing command /${interaction.commandName}:\n`, error);
         };

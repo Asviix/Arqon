@@ -18,6 +18,7 @@ export class CommandHandler {
     };
 
     public async load(): Promise<void> {
+        Logger.debug('Starting the commandHandler...');
         await this.loadDirectory(this.commandsPath);
     };
 

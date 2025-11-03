@@ -1,5 +1,7 @@
 // src\Utils\Logger.ts
 
+import { BotClient } from "../Client/BotClient";
+
 /**
  * ANSI color codes for formatting terminal output.
  */
@@ -22,6 +24,11 @@ const Colors = {
  */
 export class Logger {
     private static isDev = true;
+    private static client: BotClient | null = null;
+
+    public static init(client: BotClient) {
+        Logger.client = client;
+    };
 
     /**
      * Sets the logging environement status.
@@ -75,6 +82,9 @@ export class Logger {
      * @param args 
      */
     public static warn(message: any, ...args: any[]) {
+        if (Logger.client) {
+            Logger.client.sessionCounters.warningsLogged += 1;
+        };
         Logger.format('WARN', Colors.FgYellow, message, ...args);
     };
 
@@ -84,6 +94,9 @@ export class Logger {
      * @param args 
      */
     public static error(message: any, ...args: any[]) {
+        if (Logger.client) {
+            Logger.client.sessionCounters.errorsLogged += 1;
+        };
         Logger.format('ERROR', Colors.FgRed, message, ...args);
     };
 

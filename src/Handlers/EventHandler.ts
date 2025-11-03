@@ -18,6 +18,7 @@ export class EventLoadHandler {
     };
 
     public async load(): Promise<void> {
+        Logger.debug('Starting the eventHandler...');
         await this.loadDirectory(this.eventPath);
     };
 

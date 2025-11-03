@@ -7,6 +7,7 @@ import { LocaleStrings, LocalizationManager } from '../Locales/LocalizationManag
 import { ConfigManager } from '../Managers/ConfigManager';
 import { MySQLClient, GuildConfig } from '../Database/MySQLClient';
 import { Logger } from '../Utils/Logger';
+import { v4 as uuidv4 } from 'uuid';
 
 export class BotClient extends Client {
 
@@ -19,25 +20,33 @@ export class BotClient extends Client {
     public isProd: boolean = process.argv.includes('--env=production');
 
     // Classes
-    public db!: MySQLClient;
-    public localizationManager: LocalizationManager
-    public configManager!: ConfigManager;
+    public db: MySQLClient;
+    public localizationManager: LocalizationManager;
+    public configManager: ConfigManager;
+
+    // Misc
+    public uuid: string = uuidv4();
+    public sessionCounters = {
+        commandsRan: 0,
+        warningsLogged: 0,
+        errorsLogged: 0
+    };
 
     constructor(options: ClientOptions) {
         super(options);
-        this.db = new MySQLClient();
+        this.db = new MySQLClient(this);
         this.localizationManager = new LocalizationManager(this);
         this.configManager = new ConfigManager(this, this.db);
     };
 
     public async start(token: string) {
-        Logger.debug('Initializing Schema...');
         await this.db.initializeSchema();
 
-        Logger.debug('Loading locales...');
+        Logger.init(this)
+
         this.locales = await this.localizationManager.loadLocales();
 
-        Logger.debug('Logging into Discord...')
+        Logger.debug('Logging into Discord...');
         await this.login(token);
     };
 };

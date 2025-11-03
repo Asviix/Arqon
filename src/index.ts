@@ -33,15 +33,13 @@ const client = new BotClient({
 async function main() {
     Logger.info('Starting bot initalization...');
 
-    Logger.debug('Starting the commandHandler...');
     await new CommandHandler(client).load();
-    Logger.debug('Starting the eventHandler...');
     await new EventLoadHandler(client).load();
 
     await client.start(DISCORD_TOKEN);
 };
 
-main().catch(error => {
+main().catch (error => {
     Logger.error('Fatal error!\n', error);
     process.exit(1);
 });

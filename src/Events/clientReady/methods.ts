@@ -2,10 +2,15 @@
 
 import { Logger } from "../../Utils/Logger";
 import { BotClient } from "../../Client/BotClient";
-import { ActivityType, TextChannel } from "discord.js";
+import { ActivityType, ClientUser, TextChannel } from "discord.js";
 import { sendLogMessage_Embed } from './embeds';
 
-export async function setActivity(client: BotClient, name: string, type: ActivityType): Promise<void> {
+export async function clientReadyRunMethods(client: BotClient, name: string, type: ActivityType): Promise<void> {
+    await setActivity(client, name, type);
+    await logPinMessage(client);
+};
+
+async function setActivity(client: BotClient, name: string, type: ActivityType): Promise<void> {
     Logger.debug('Setting activity...');
     if (client.user) {
         client.user.setActivity({
@@ -13,11 +18,11 @@ export async function setActivity(client: BotClient, name: string, type: Activit
             type: type
         });
     } else {
-        Logger.warn('Cannot set activity: Client user object is not available.')
+        Logger.warn('Cannot set activity: Client user object is not available.');
     }
 };
 
-export async function logPinMessage(client: BotClient): Promise<void> {
+async function logPinMessage(client: BotClient): Promise<void> {
     Logger.info('Editing pinned message...');
     const DEV_DISCORD_GUILD = await client.guilds.fetch(process.env.DEV_DISCORD_ID as string);
 
@@ -31,24 +36,25 @@ export async function logPinMessage(client: BotClient): Promise<void> {
             startupTime: new Date()
         });
 
-        DEV_DISCORD_LOGS_CHANNEL.messages.fetchPins()
-            .then(messages => {
-                if (messages.items.length === 0) {
-                    Logger.debug('Pinned message not found, creating...');
+        const pins = await DEV_DISCORD_LOGS_CHANNEL.messages.fetchPins();
+        let clientUser: ClientUser;
+        if (client.user) {
+            clientUser = client.user;
+        } else {
+            return Logger.warn('Cannot update pinned message: Client user object is not available.');
+        };
+        
+        const botPinnedMessage = pins.items.find(message => message.message.author.id === clientUser.id);
 
-                    DEV_DISCORD_LOGS_CHANNEL.send({
-                        embeds: [statusEmbed]
-                    }).then(message => {
-                        message.pin();
-                    });
-                } else {
-                    if (messages.items[0].message.author.id === client.user!.id) {
-                        messages.items[0].message.edit({
-                            embeds: [statusEmbed]
-                        });
-                    };
-                };
-            });
+        if (botPinnedMessage) {
+            Logger.debug('Found status message, Editing...');
+            await botPinnedMessage.message.edit({ embeds: [statusEmbed] });
+        } else {
+            Logger.debug('Status message not found, Creating...');
+            const newMessage = await DEV_DISCORD_LOGS_CHANNEL.send({ embeds: [statusEmbed] });
+            Logger.debug('Pinning the new message...');
+            await newMessage.pin();
+        };
     } catch (error) {
         Logger.warn('Error sending log message!\n', error);
     };
