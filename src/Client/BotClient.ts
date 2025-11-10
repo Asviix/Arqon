@@ -6,6 +6,7 @@ import { EventHandler } from '../Events/BaseEvent';
 import { LocaleStrings, LocalizationManager } from '../Locales/LocalizationManager';
 import { ConfigManager } from '../Managers/ConfigManager';
 import { MySQLClient, GuildConfig } from '../Database/MySQLClient';
+import { browserService } from '../Utils/BrowserService';
 import { Logger } from '../Utils/Logger';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,6 +42,8 @@ export class BotClient extends Client {
 
     public async start(token: string) {
         await this.db.initializeSchema();
+
+        await browserService.launchBrowser();
 
         Logger.init(this)
 
