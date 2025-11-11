@@ -1,8 +1,7 @@
 // src\Commands\hltv\command.ts
 
-import { Command } from "../BaseCommand";
-import { BotClient } from "../../Client/BotClient";
-import { InteractionContextType, SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { Command, CommandContext } from '../BaseCommand';
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 import { runMethod } from "./methods/manager";
 
 export default class hltvCommand extends Command {
@@ -13,11 +12,11 @@ export default class hltvCommand extends Command {
         .setDescription('Fetch a large amount of data from HLTV.org')
         .setContexts(InteractionContextType.Guild);
     
-    public async execute(client: BotClient, interaction: ChatInputCommandInteraction, languageCode: string) {
+    public async execute({client, interaction, languageCode}: CommandContext) {
 
         interaction.deferReply();
     
-        const returnEmbed = await runMethod('live');
+        const returnEmbed = await runMethod({client, interaction, languageCode}, 'live');
 
         interaction.followUp({
             embeds: [returnEmbed]

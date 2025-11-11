@@ -1,10 +1,9 @@
 // src\Commands\owner\shutdownCommand\command.ts
 
 import { Logger } from "../../../Utils/Logger";
-import { Command } from "../../BaseCommand";
-import { BotClient } from "../../../Client/BotClient";
+import { Command, CommandContext } from "../../BaseCommand";
 import { isOwner } from "../../../Utils/Permissions";
-import { SlashCommandBuilder, ChatInputCommandInteraction, InteractionContextType, InteractionResponse, MessageFlags } from "discord.js";
+import { SlashCommandBuilder, InteractionContextType, InteractionResponse, MessageFlags } from "discord.js";
 
 export default class ShutdownCommand extends Command {
     public cooldown = 0;
@@ -14,7 +13,7 @@ export default class ShutdownCommand extends Command {
         .setDescription('Shuts down the bot process.')
         .setContexts(InteractionContextType.Guild)
 
-    public async execute(client: BotClient, interaction: ChatInputCommandInteraction, languageCode: string): Promise<void | InteractionResponse> {
+    public async execute({client, interaction, languageCode}: CommandContext): Promise<void | InteractionResponse> {
         
         if (!isOwner(interaction.user.id)) {
             return interaction.reply('Tf are you trying to do?')
@@ -28,6 +27,8 @@ export default class ShutdownCommand extends Command {
         });
 
         await client.db.syncSessionCounters();
+
+        Logger.info(`Shutdown complete... Destroying app.`)
 
         client.destroy();
         process.exit(0);

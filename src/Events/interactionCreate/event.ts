@@ -5,6 +5,7 @@ import { BotClient } from "../../Client/BotClient";
 import { EventHandler } from "../BaseEvent";
 import { ChatInputCommandInteraction, Interaction, MessageFlags } from "discord.js";
 import { interactionErrorReply, isCooldown} from "./methods";
+import { CommandContext } from "../../Commands/BaseCommand";
 
 export default class InteractionCreateEvent extends EventHandler {
     public name = 'interactionCreate';
@@ -29,6 +30,12 @@ export default class InteractionCreateEvent extends EventHandler {
 
         const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
 
+        const context: CommandContext = {
+            client,
+            interaction,
+            languageCode
+        }
+
         try {
             const [userInCooldown, remaining] = await isCooldown(client, interaction.user.id, command);
 
@@ -44,7 +51,7 @@ export default class InteractionCreateEvent extends EventHandler {
             };
             client.sessionCounters.commandsRan += 1;
 
-            await command.execute(client, interaction as ChatInputCommandInteraction, languageCode);
+            await command.execute(context);
         } catch (error) {
             responseText = await client.localizationManager.getString(languageCode, 'ERROR_GENERIC');
 

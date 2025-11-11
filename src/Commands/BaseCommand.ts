@@ -8,6 +8,12 @@ import {
 
 import { BotClient } from '../Client/BotClient';
 
+export interface CommandContext {
+    client: BotClient,
+    interaction: ChatInputCommandInteraction,
+    languageCode: string
+}
+
 /**
  * The base class for all application commands.
  */
@@ -23,9 +29,7 @@ export abstract class Command {
      * @returns A promise resolving to the interaction response.
      */
     public abstract execute(
-        client: BotClient,
-        interaction: ChatInputCommandInteraction,
-        languageCode: string
+        context: CommandContext
     ): Promise<void | InteractionResponse>;
 
     public get name(): string {

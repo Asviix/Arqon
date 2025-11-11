@@ -25,7 +25,7 @@ export class LocalizationManager {
      * @param replacements Replacements made if necessary.
      * @returns The formatted and replaced string in the correct locale.
      */
-    public async getString(languageCode: string, key: string, replacements: Record<string, string> = {}): Promise<string> {
+    public getString(languageCode: string, key: string, replacements: Record<string, string> = {}): string {
         let stringTemplate = this.client.locales[languageCode]?.[key];
 
         if (!stringTemplate) {

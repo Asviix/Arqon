@@ -4,8 +4,9 @@ import * as cheerio from 'cheerio';
 import { browserService } from '../../../Utils/BrowserService';
 import { createMatchEmbed } from '../services/embedsGenerator';
 import { EmbedBuilder } from 'discord.js';
+import { CommandContext } from '../../BaseCommand';
 
-export async function getLiveMatches(): Promise<EmbedBuilder> {
+export async function getLiveMatches(context: CommandContext): Promise<EmbedBuilder> {
     const EVENTS_URL = 'https://www.hltv.org/matches';
     
     const page = await browserService.getNewPage();
@@ -80,7 +81,7 @@ export async function getLiveMatches(): Promise<EmbedBuilder> {
         });
     });
 
-    const liveMatchesEmbed = createMatchEmbed(matchesData);
+    const liveMatchesEmbed = createMatchEmbed(context, matchesData);
 
     await page.close();
     return liveMatchesEmbed;
