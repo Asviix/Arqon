@@ -1,11 +1,26 @@
 # Changelog
 
-## 0.0.2 - 2025-11-11
+0.0.3 - 
+---
+
+__
+
+### Changed
+
+##### **Refactoring:**
+- Slight changes on how `index.ts` declares the token from the environment strings.
+- Small change of how `/ping (command.ts)` checks for edge-cases on the Uptime variable.
+- Other small changes.
+
+
+0.0.2 - 2025-11-11
+---
 
 _Command Handling Rework and Architectural Refinements._
 
 ### Added
-##### **Localization**:
+
+##### **Localization:**
 - Add new locale strings for the HLTV command. ([en-US.json](https://github.com/Asviix/Arqon/blob/main/src/Locales/en-US.json))
 
 ### Changed

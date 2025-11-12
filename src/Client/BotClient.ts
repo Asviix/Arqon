@@ -10,6 +10,9 @@ import { browserService } from '../Utils/BrowserService';
 import { Logger } from '../Utils/Logger';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * The BotClient class that extends client.
+ */
 export class BotClient extends Client {
 
     // Interfaces

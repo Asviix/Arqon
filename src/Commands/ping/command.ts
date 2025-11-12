@@ -18,9 +18,6 @@ export default class PingCommand extends Command {
         .setDescription('Replies with Pong! (and checks the latency).')
         .setContexts(InteractionContextType.Guild);
 
-    /**
-     * The main execution logic for the command.
-     */
     public async execute({client, interaction, languageCode}: CommandContext) {
 
         const pinging = await interaction.deferReply() // Defer reply
@@ -39,7 +36,15 @@ export default class PingCommand extends Command {
         let minutes = minutesTemp === 0 ? '': minutesTemp + 'm, ';
         let seconds = secondsTemp === 0 ? '': secondsTemp + 's';
 
-        let uptime = days + hours + minutes + seconds
+        let uptime = days + hours + minutes + seconds;
+
+        if (uptime.endsWith(', ')) {
+            uptime = uptime.slice(0, -2);
+        };
+
+        if (uptime === '') {
+            uptime = 'Less than 1 second.'
+        };
 
         const returnEmbed = createPingEmbed({client, interaction, languageCode}, {ws, apiLatency, uptime})
 

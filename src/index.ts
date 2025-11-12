@@ -13,9 +13,7 @@ const isProduction = args.includes('--env=production');
 Logger.setEnvironment(isProduction);
 Logger.debug('Started in debug!');
 
-const DISCORD_TOKEN_ENV: any = process.env.DISCORD_TOKEN;
-const DISCORD_TOKEN: string = DISCORD_TOKEN_ENV.toString();
-
+const DISCORD_TOKEN: string = process.env.DISCORD_TOKEN!.toString();
 Logger.debug('Checking environment token...');
 if (!DISCORD_TOKEN || typeof DISCORD_TOKEN !== 'string') {
     throw new Error('DISCORD_TOKEN is not set in environment variables.');

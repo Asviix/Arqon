@@ -18,7 +18,7 @@ export function runMethod(context: CommandContext, method: string, ...args: any[
         const title = context.client.localizationManager.getString(context.languageCode, "COMMAND_HLTV_MANAGER_ERROR1_TITLE");
         const description = context.client.localizationManager.getString(context.languageCode, "COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION", {
             method: method
-        })
+        });
 
         return Promise.resolve(
             new EmbedBuilder()
