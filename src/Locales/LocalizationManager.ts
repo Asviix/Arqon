@@ -2,8 +2,8 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Logger } from '../Utils/Logger';
-import { BotClient } from '../Client/BotClient';
+import { Logger } from '@/Utils/Logger';
+import { BotClient } from '@/Client/BotClient';
 
 export interface LocaleStrings {
     [key: string]: { [stringKey: string]: string };

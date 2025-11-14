@@ -2,8 +2,8 @@
 
 import { EmbedBuilder } from "discord.js";
 import { getLiveMatches } from "./live/live";
-import { Logger } from "../../../Utils/Logger";
-import { CommandContext } from '../../BaseCommand';
+import { Logger } from "@/Utils/Logger";
+import { CommandContext } from '@/Commands/BaseCommand';
 
 type HLTVMethod = (...args: any[]) => Promise<EmbedBuilder>;
 

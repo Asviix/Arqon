@@ -1,7 +1,7 @@
 // src\Commands\hltv\services\embedsGenerator.ts
 
 import { EmbedBuilder } from "discord.js";
-import { CommandContext } from "../../BaseCommand";
+import { CommandContext } from "@/Commands/BaseCommand";
 
 interface Match {
     matchLink: string,

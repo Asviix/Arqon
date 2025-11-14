@@ -1,11 +1,11 @@
 // src\Events\interactionCreate\event.ts
 
-import { Logger } from "../../Utils/Logger";
-import { BotClient } from "../../Client/BotClient";
-import { EventHandler } from "../BaseEvent";
+import { Logger } from "@/Utils/Logger";
+import { BotClient } from "@/Client/BotClient";
+import { EventHandler } from "@/Events/BaseEvent";
 import { ChatInputCommandInteraction, Interaction, MessageFlags } from "discord.js";
 import { interactionErrorReply, isCooldown} from "./methods";
-import { CommandContext } from "../../Commands/BaseCommand";
+import { CommandContext } from "@/Commands/BaseCommand";
 
 export default class InteractionCreateEvent extends EventHandler {
     public name = 'interactionCreate';

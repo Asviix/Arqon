@@ -7,7 +7,7 @@ import {
     SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
 
-import { BotClient } from '../Client/BotClient';
+import { BotClient } from '@/Client/BotClient';
 
 export interface CommandContext {
     client: BotClient,

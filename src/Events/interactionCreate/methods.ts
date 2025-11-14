@@ -1,7 +1,7 @@
 // src\Events\interactionCreate\methods.ts
 
-import { Command } from "../../Commands/BaseCommand";
-import { BotClient } from "../../Client/BotClient";
+import { Command } from "@/Commands/BaseCommand";
+import { BotClient } from "@/Client/BotClient";
 import { ChatInputCommandInteraction, Collection, MessageFlags } from "discord.js";
 
 /**

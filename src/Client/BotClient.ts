@@ -1,13 +1,13 @@
 // src\Client\BotClient.ts
 
 import { Client, Collection, ClientOptions } from 'discord.js';
-import { Command } from '../Commands/BaseCommand';
-import { EventHandler } from '../Events/BaseEvent';
-import { LocaleStrings, LocalizationManager } from '../Locales/LocalizationManager';
-import { ConfigManager } from '../Managers/ConfigManager';
-import { MySQLClient, GuildConfig } from '../Database/MySQLClient';
-import { browserService } from '../Utils/BrowserService';
-import { Logger } from '../Utils/Logger';
+import { Command } from '@/Commands/BaseCommand';
+import { EventHandler } from '@/Events/BaseEvent';
+import { LocaleStrings, LocalizationManager } from '@/Locales/LocalizationManager';
+import { ConfigManager } from '@/Managers/ConfigManager';
+import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
+import { browserService } from '@/Utils/BrowserService';
+import { Logger } from '@/Utils/Logger';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

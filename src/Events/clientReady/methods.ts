@@ -1,7 +1,7 @@
 // src\Events\clientReady\methods.ts
 
-import { Logger } from "../../Utils/Logger";
-import { BotClient } from "../../Client/BotClient";
+import { Logger } from "@/Utils/Logger";
+import { BotClient } from "@/Client/BotClient";
 import { ActivityType, ClientUser, TextChannel } from "discord.js";
 import { sendLogMessage_Embed } from './embeds';
 

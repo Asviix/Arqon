@@ -4,12 +4,6 @@ import { Command, CommandContext } from '../BaseCommand'
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 import { createPingEmbed } from './services/embedsGenerator';
 
-export interface PingData {
-    ws: number,
-    apiLatency: number,
-    uptime: string
-};
-
 export default class PingCommand extends Command {
     public cooldown = 5;
 

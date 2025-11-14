@@ -1,7 +1,7 @@
 // src\Database\MySQLClient.ts
 
-import { BotClient } from '../Client/BotClient';
-import { Logger } from '../Utils/Logger';
+import { BotClient } from '@/Client/BotClient';
+import { Logger } from '@/Utils/Logger';
 import * as mysql from 'mysql2/promise';
 
 /**

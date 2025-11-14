@@ -1,11 +1,11 @@
 // src\index.ts
 
 import 'dotenv/config'; // Load Environment Variables from .env file
-import { Logger } from './Utils/Logger';
 import { GatewayIntentBits } from 'discord.js';
-import { BotClient } from './Client/BotClient';
-import { CommandHandler } from './Handlers/CommandHandler';
-import { EventLoadHandler } from './Handlers/EventHandler';
+import { Logger } from '@/Utils/Logger';
+import { BotClient } from '@/Client/BotClient';
+import { CommandHandler } from '@/Handlers/CommandHandler';
+import { EventLoadHandler } from '@/Handlers/EventHandler';
 
 const args = process.argv;
 const isProduction = args.includes('--env=production');

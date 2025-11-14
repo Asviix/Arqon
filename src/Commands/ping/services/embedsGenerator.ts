@@ -1,8 +1,13 @@
 // src\Commands\ping\pingCommand\services\embedsGenerator.ts
 
 import { EmbedBuilder } from "discord.js";
-import { CommandContext } from "../../BaseCommand";
-import { PingData } from "../command";
+import { CommandContext } from "@/Commands/BaseCommand";
+
+interface PingData {
+    ws: number,
+    apiLatency: number,
+    uptime: string
+};
 
 export function createPingEmbed(context: CommandContext, data: PingData): EmbedBuilder {
     const LMA = context.client.localizationManager;
