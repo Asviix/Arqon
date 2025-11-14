@@ -52,6 +52,7 @@ export function createMatchEmbed(context: CommandContext, matchesData: Match[]):
         .setTitle(title)
         .setDescription(description)
         .setColor('#ffa200')
+        .setThumbnail('https://www.hltv.org/img/static/TopSmallLogo2x.png')
         .addFields(createMatchFields(context, matchesData))
         .setTimestamp();
 };

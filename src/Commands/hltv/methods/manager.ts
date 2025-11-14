@@ -1,7 +1,7 @@
 // src\Commands\hltv\methods\manager.ts
 
 import { EmbedBuilder } from "discord.js";
-import { getLiveMatches } from "./live";
+import { getLiveMatches } from "./live/live";
 import { Logger } from "../../../Utils/Logger";
 import { CommandContext } from '../../BaseCommand';
 

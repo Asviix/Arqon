@@ -7,7 +7,7 @@
     "COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION": "The data source for /hltv {method} is not available.",
     "COMMAND_HLTV_LIVE_MATCHES_EMBED_TITLE": "**LIVE HLTV MATCHES**",
     "COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION": "Current tracking {matches} active matches.",
-    "COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME": "**[{meta}]** {team1} vs ${team2}",
+    "COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME": "**[{meta}]** {team1} vs {team2}",
     "COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE": "Event: **{event}**\nScore: `{currentScore1} - {currentScore2} ({mapScore1} - {mapScore2})`\n[🔗 Event Link](https://hltv.org{matchLink})",
 
 

@@ -1,10 +1,10 @@
 // src\Commands\hltv\methods\live.ts
 
 import * as cheerio from 'cheerio';
-import { browserService } from '../../../Utils/BrowserService';
-import { createMatchEmbed } from '../services/embedsGenerator';
+import { browserService } from '../../../../Utils/BrowserService';
+import { createMatchEmbed } from '../../services/embedsGenerator';
 import { EmbedBuilder } from 'discord.js';
-import { CommandContext } from '../../BaseCommand';
+import { CommandContext } from '../../../BaseCommand';
 
 export async function getLiveMatches(context: CommandContext): Promise<EmbedBuilder> {
     const EVENTS_URL = 'https://www.hltv.org/matches';
