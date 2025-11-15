@@ -1,14 +1,16 @@
 // src\Commands\hltv\methods\manager.ts
 
 import { EmbedBuilder } from "discord.js";
-import { getLiveMatches } from "./live/live";
 import { Logger } from "@/Utils/Logger";
 import { CommandContext } from '@/Commands/BaseCommand';
+import { getLiveMatches } from "./live";
+import { getPlayerStats } from "./playerStats";
 
 type HLTVMethod = (...args: any[]) => Promise<EmbedBuilder>;
 
 const methodRegistry: Record<string, HLTVMethod> = {
-    'live': getLiveMatches
+    'live': getLiveMatches,
+    'stats': getPlayerStats
 };
 
 export function runMethod(context: CommandContext, method: string, ...args: any[]): Promise<EmbedBuilder> {

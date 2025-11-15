@@ -1,7 +1,7 @@
 // src\Commands\hltv\command.ts
 
 import { Command, CommandContext } from '@/Commands/BaseCommand';
-import { EmbedBuilder, InteractionContextType, SlashCommandBuilder } from 'discord.js';
+import { EmbedBuilder, InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { runMethod } from "./methods/manager";
 
 export default class hltvCommand extends Command {
@@ -32,7 +32,9 @@ export default class hltvCommand extends Command {
     
     public async execute({client, interaction, languageCode}: CommandContext) {
 
-        await interaction.deferReply();
+        await interaction.deferReply({
+            flags: MessageFlags.Ephemeral
+        });
 
         let returnEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Test1')
@@ -48,7 +50,7 @@ export default class hltvCommand extends Command {
                     switch (subCommand) {
                         case 'stats':
                             const playerName = interaction.options.getString('name');
-                            returnEmbed = await runMethod({client, interaction, languageCode}, subCommand);
+                            returnEmbed = await runMethod({client, interaction, languageCode}, subCommand, playerName);
                     };
             };
 

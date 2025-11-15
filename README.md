@@ -4,12 +4,19 @@
 
 __
 
+### Added
+
+#### **Commands:**
+
+- Added the `/hltv player stats <playerName>` command, to retrieve the stats of any player on HTLV using their nickname.
+
 ### Changed
 
 #### **Refactoring:**
 
 - Slight changes on how `index.ts` declares the token from the environment strings.
 - Small change of how `/ping (command.ts)` checks for edge-cases on the Uptime variable.
+- Refactored imports in all files to include a named path for better readability and maintainability. ([`c9197`](https://github.com/Asviix/Arqon/commit/c9197dea0ebefa31936df35a28269c2d678e8807))
 - Other small changes.
 
 #### **GitHub**

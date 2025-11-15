@@ -1,6 +1,6 @@
 // src\Config\hltvPlayerDatabase.ts
 
-export const HLTV_PLAYER_IDS: Record<string, number> = {
+export const HLTV_PLAYER_IDS = {
     s1mple: 7998,
-    ZywOo: 11893
+    zywoo: 11893
 };

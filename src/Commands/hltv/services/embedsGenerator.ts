@@ -56,3 +56,53 @@ export function createMatchEmbed(context: CommandContext, matchesData: Match[]):
         .addFields(createMatchFields(context, matchesData))
         .setTimestamp();
 };
+
+interface Stats {
+    statsUrl: string,
+    playerName: string,
+    playerImageURL: string,
+    mapCount: string,
+    tRating: string,
+    ctRating: string,
+    boxRating: string,
+    boxRatingType: string,
+    roundSwing: string,
+    deathPerRound: string,
+    kast: string,
+    multiKill: string,
+    adr: string,
+    kpr: string
+}
+
+export function createStatsEmbed(context: CommandContext, stats: Stats): EmbedBuilder {
+    return new EmbedBuilder()
+        .setTitle(`${stats.playerName}`)
+        .setURL(stats.statsUrl)
+        .setThumbnail(stats.playerImageURL)
+        .setDescription(`Stats Over ${stats.mapCount}:`)
+        .setColor('#ffa200')
+        .addFields(
+            {
+                name: 'Ratings',
+                value: `
+                    CT Rating: **${stats.ctRating}**
+                    T Rating: **${stats.tRating}**
+                    ${stats.boxRatingType}: **${stats.boxRating}**
+                `,
+                inline: false
+            },  
+            {
+                name: 'Performance Metrics',
+                value: `
+                    Round Swing: **${stats.roundSwing}%**
+                    Death Per Round: **${stats.deathPerRound}**
+                    KAST: **${stats.kast}%**
+                    Multi-Kills: **${stats.multiKill}%**
+                    ADR: **${stats.adr}**
+                    KPR: **${stats.kpr}**
+                `,
+                inline: true
+            }
+        )
+        .setTimestamp();
+};
