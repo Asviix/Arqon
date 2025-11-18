@@ -29,6 +29,7 @@ class BrowserService {
                 headless: true,
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
                 protocolTimeout: 180000,
+                defaultViewport: { width: 1920, height: 1080}
             });
         };
     };

@@ -35,6 +35,8 @@ export const playerStatsHTMLData = {
     boxRating: 'div.player-summary-stat-box-rating-data-text',
     boxRatingType: 'div.player-summary-stat-box-data-description-text',
 
-    performanceMetrics: 'div.player-summary-stat-box-data-wrapper'
+    performanceMetrics: 'div.player-summary-stat-box-data-wrapper',
+
+    roleStatsScore: 'div.row-stats-section-score'
 };
 

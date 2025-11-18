@@ -1,6 +1,6 @@
 // src\Client\BotClient.ts
 
-import { Client, Collection, ClientOptions } from 'discord.js';
+import { Client, Collection, ClientOptions, ColorResolvable } from 'discord.js';
 import { Command } from '@/Commands/BaseCommand';
 import { EventHandler } from '@/Events/BaseEvent';
 import { LocaleStrings, LocalizationManager } from '@/Locales/LocalizationManager';
@@ -27,6 +27,9 @@ export class BotClient extends Client {
     public db: MySQLClient;
     public localizationManager: LocalizationManager;
     public configManager: ConfigManager;
+
+    // Colors
+    public embedOrangeColor: ColorResolvable = '#ffa200';
 
     // Misc
     public uuid: string = uuidv4();

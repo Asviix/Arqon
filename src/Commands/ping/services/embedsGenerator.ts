@@ -21,7 +21,7 @@ export function createPingEmbed(context: CommandContext, data: PingData): EmbedB
 
     return new EmbedBuilder()
         .setTitle(title)
-        .setColor('#ffa200')
+        .setColor(context.client.embedOrangeColor)
         .addFields(
             { name: field_title, value: field_description}
         )

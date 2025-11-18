@@ -27,6 +27,32 @@ export default class hltvCommand extends Command {
                     .setDescription('The name of the player you want the stats of.')
                     .setRequired(true)
                 )
+                .addStringOption(gameVersionOption => gameVersionOption
+                    .setName('game_version')
+                    .setDescription('The version of Counter-Strike to get.')
+                    .setRequired(false)
+                    .addChoices(
+                        {name: 'CS:GO', value: 'CSGO'},
+                        {name: 'CS2', value: 'CS2'}
+                    )
+                )
+                .addStringOption(matchTypeOption => matchTypeOption
+                    .setName('match_type')
+                    .setDescription('The type of matches to include.')
+                    .setRequired(false)
+                    .addChoices(
+                        {name: 'Majors', value: 'Majors'},
+                        {name: 'Big Events', value: 'BigEvents'},
+                        {name: 'LAN', value: 'Lan'},
+                        {name: 'Online', value: 'Online'}
+                    )
+                )
+                .addStringOption(mapOption => mapOption
+                    .setName('maps')
+                    .setDescription('Specifiy map(s) to retrieve the specific stats of')
+                    .setRequired(false)
+                    .setAutocomplete(true)
+                )
             )
         )
     
@@ -50,7 +76,10 @@ export default class hltvCommand extends Command {
                     switch (subCommand) {
                         case 'stats':
                             const playerName = interaction.options.getString('name');
-                            returnEmbed = await runMethod({client, interaction, languageCode}, subCommand, playerName);
+                            const gameVersion = interaction.options.getString('game_version');
+                            const matchType = interaction.options.getString('match_type');
+                            const mapInput = interaction.options.getString('maps');
+                            returnEmbed = await runMethod({client, interaction, languageCode}, subCommand, playerName, gameVersion, matchType, mapInput);
                     };
             };
 

@@ -8,7 +8,7 @@ __
 
 #### **Commands:**
 
-- Added the `/hltv player stats <playerName>` command, to retrieve the stats of any player on HTLV using their nickname.
+- Added the `/hltv player stats <playerName>` command, to retrieve the stats of any player on HTLV using their nickname. ([`#1`](https://github.com/Asviix/Arqon/issues/1))
 
 ### Changed
 
