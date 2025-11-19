@@ -1,9 +1,8 @@
 // src\Client\BotClient.ts
 
 import { Client, Collection, ClientOptions, ColorResolvable } from 'discord.js';
-import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { browserService } from '@/Utils/BrowserService';
+import { BrowserService } from '@/Utils/BrowserService';
 import { EventHandler } from '@/Events/BaseEvent';
 import { ConfigManager } from '@/Managers/ConfigManager';
 import { Command } from '@/Commands/BaseCommand';
@@ -17,17 +16,18 @@ import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
 export class BotClient extends Client {
 
     // Interfaces
-    public commands: Collection<string, Command> = new Collection();
-    public eventFiles: Collection<string, EventHandler> = new Collection();
-    public cooldowns: Collection<string, Collection<string, number>> = new Collection();
     public locales: LocaleStrings = {};
     public guildConfigs: Collection<string, GuildConfig> = new Collection();
     public isProd: boolean = process.argv.includes('--env=production');
 
     // Classes
+    public commands: Collection<string, Command> = new Collection();
+    public eventFiles: Collection<string, EventHandler> = new Collection();
+    public cooldowns: Collection<string, Collection<string, number>> = new Collection();
     public db: MySQLClient;
     public localizationManager: LocalizationManager;
     public configManager: ConfigManager;
+    public browserService!: BrowserService;
 
     // Colors
     public embedOrangeColor: ColorResolvable = '#ffa200';
@@ -50,7 +50,8 @@ export class BotClient extends Client {
     public async start(token: string) {
         await this.db.initializeSchema();
 
-        await browserService.launchBrowser();
+        this.browserService = BrowserService.getInstance();
+        await this.browserService.launchBrowser();
 
         Logger.init(this)
 

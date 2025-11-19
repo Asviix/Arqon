@@ -1,6 +1,6 @@
 // src\Commands\hltv\command.ts
 
-import { EmbedBuilder, InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { InteractionContextType, InteractionReplyOptions, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { Command, CommandContext } from '@/Commands/BaseCommand';
 import { runMethod } from "./manager";
 
@@ -63,10 +63,9 @@ export default class HLTVCommand extends Command {
             flags: MessageFlags.Ephemeral
         });
 
-        let returnEmbed: EmbedBuilder = new EmbedBuilder()
-            .setTitle('Test1')
-            .setDescription('Test2')
-            .setColor('Aqua')
+        let returnPayload: InteractionReplyOptions = {
+            content: 'How did we get here ?'
+        };
 
         const subCommandGroup = c.interaction.options.getSubcommandGroup();
 
@@ -80,7 +79,7 @@ export default class HLTVCommand extends Command {
                             const gameVersion = c.interaction.options.getString('game_version');
                             const matchType = c.interaction.options.getString('match_type');
                             const mapInput = c.interaction.options.getString('maps');
-                            returnEmbed = await runMethod(c, subCommand, playerName, gameVersion, matchType, mapInput);
+                            returnPayload = await runMethod(c, subCommand, playerName, gameVersion, matchType, mapInput);
                     };
             };
 
@@ -88,12 +87,10 @@ export default class HLTVCommand extends Command {
             const subCommand = c.interaction.options.getSubcommand();
             switch (subCommand) {
                 case 'live':
-                    returnEmbed = await runMethod(c, subCommand);
+                    returnPayload = await runMethod(c, subCommand);
             };
         };
 
-        await c.interaction.followUp({
-            embeds: [returnEmbed]
-        });
+        await c.interaction.followUp(returnPayload);
     };
 };

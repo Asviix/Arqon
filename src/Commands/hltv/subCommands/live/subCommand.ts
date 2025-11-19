@@ -1,15 +1,14 @@
 //src/Commands/hltv/subCommands/live/subCommand.ts
 
-import { EmbedBuilder } from 'discord.js';
+import { InteractionReplyOptions } from 'discord.js';
 import * as cheerio from 'cheerio';
-import { browserService } from '@/Utils/BrowserService';
 import { CommandContext } from '@/Commands/BaseCommand';
 import { createMatchEmbed } from './services/embedsGenerator';
 import { liveMatchesHTMLData as htmlData } from './data/htmlScrapeData';
 
-export async function getLiveMatches(c: CommandContext): Promise<EmbedBuilder> {
+export async function getLiveMatches(c: CommandContext): Promise<InteractionReplyOptions> {
     
-    const page = await browserService.getNewPage();
+    const page = await c.client.browserService.getNewPage();
 
     await page.goto(htmlData.MATCHES_URL, {
         waitUntil: 'networkidle2',
@@ -61,7 +60,10 @@ export async function getLiveMatches(c: CommandContext): Promise<EmbedBuilder> {
     });
 
     const liveMatchesEmbed = createMatchEmbed(c, matchesData);
+    const returnPayload: InteractionReplyOptions = {
+        embeds: [liveMatchesEmbed]
+    };
 
     await page.close();
-    return liveMatchesEmbed;
+    return returnPayload;
 };

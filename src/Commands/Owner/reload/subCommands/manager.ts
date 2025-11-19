@@ -15,11 +15,11 @@ export function runMethod(c: CommandContext, method: string, ...args: any[]): Pr
     const methodFunction = methodRegistry[method];
 
     if (!methodFunction) {
-        const returnMessage: InteractionReplyOptions = {
+        const returnPayload: InteractionReplyOptions = {
             content: 'Invalid method!',
             flags: MessageFlags.Ephemeral
         };
-        return Promise.resolve(returnMessage);
+        return Promise.resolve(returnPayload);
     };
 
     try {

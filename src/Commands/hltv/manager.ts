@@ -1,34 +1,34 @@
 //src/Commands/hltv/manager.ts
 
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, InteractionReplyOptions } from "discord.js";
 import { CommandContext } from '@/Commands/BaseCommand';
 import { getLiveMatches } from "./subCommands/live/subCommand";
 import { getPlayerStats } from "./subCommandGroups/player/subCommands/playerStats/subCommand";
 import { Logger } from "@/Utils/Logger";
 
-type HLTVMethod = (...args: any[]) => Promise<EmbedBuilder>;
+type HLTVMethod = (...args: any[]) => Promise<InteractionReplyOptions>;
 
 const methodRegistry: Record<string, HLTVMethod> = {
     'live': getLiveMatches,
     'stats': getPlayerStats
 };
 
-export function runMethod(c: CommandContext, method: string, ...args: any[]): Promise<EmbedBuilder> {
+export function runMethod(c: CommandContext, method: string, ...args: any[]): Promise<InteractionReplyOptions> {
     const _ = c._;
     const methodFunction = methodRegistry[method];
 
     if (!methodFunction) {
-        const title = _.COMMAND_HLTV_MANAGER_ERROR1_TITLE();
-        const description = _.COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION({
-            method: method
-        });
+        const noMethodFunctionEmbed = new EmbedBuilder()
+            .setTitle(_.COMMAND_HLTV_MANAGER_ERROR1_TITLE())
+            .setDescription(_.COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION({
+                method: method
+            }))
+            .setColor(c.client.embedOrangeColor);
+        const returnPayload: InteractionReplyOptions = {
+            embeds: [noMethodFunctionEmbed]
+        }
 
-        return Promise.resolve(
-            new EmbedBuilder()
-                .setTitle(title)
-                .setDescription(description)
-                .setColor('#ff0000')
-        );
+        return Promise.resolve(returnPayload);
     };
 
     try {

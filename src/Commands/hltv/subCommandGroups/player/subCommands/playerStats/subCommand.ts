@@ -1,16 +1,16 @@
 //src/Commands/hltv/subCommands/playerStats/subCommand.ts
 
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
 import * as cheerio from 'cheerio';
-import { browserService } from '@/Utils/BrowserService';
 import { CommandContext } from '@/Commands/BaseCommand';
 import { createStatsEmbed } from './services/embedsGenerator';
 import { HLTV_PLAYER_IDS as playerIds } from '@/Config/hltvPlayerDatabase';
 import { playerStatsHTMLData as htmlData } from './data/htmlScrapeData';
 
-export async function getPlayerStats(c: CommandContext, playerName: string, gameVersion: string, matchType: string, mapInput: string): Promise<EmbedBuilder> {
+export async function getPlayerStats(c: CommandContext, playerName: string, gameVersion: string, matchType: string, mapInput: string): Promise<InteractionReplyOptions> {
     const _ = c._;
-    const page = await browserService.getNewPage();
+    let returnPayload: InteractionReplyOptions;
+    const page = await c.client.browserService.getNewPage();
 
     const filters: string[] = []
     gameVersion ? filters.push(gameVersion) : ''
@@ -23,8 +23,8 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
         const invalidMaps = mapArray.filter(map => !VALID_MAPS.includes(map));
         
         if (invalidMaps.length > 0) {
-            return new EmbedBuilder()
-                .setTitle(_.BASE_ERROR_COMMAND_NOT_FOUND())
+            const invalidParametersEmbed = new EmbedBuilder()
+                .setTitle(_.COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_TITLE())
                 .setColor(c.client.embedOrangeColor)
                 .addFields(
                     {
@@ -33,6 +33,9 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
                     }
                 )
                 .setTimestamp();
+            returnPayload = {
+                embeds: [invalidParametersEmbed]
+            };
         };
     };
 
@@ -171,5 +174,10 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
     const playerStatsEmbed = createStatsEmbed(c, stats)
 
     await page.close();
-    return playerStatsEmbed;
+
+    returnPayload = {
+        embeds: [playerStatsEmbed]
+    };
+
+    return returnPayload;
 };
