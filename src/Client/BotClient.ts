@@ -1,6 +1,7 @@
 // src\Client\BotClient.ts
 
 import { Client, Collection, ClientOptions, ColorResolvable } from 'discord.js';
+import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { browserService } from '@/Utils/BrowserService';
 import { EventHandler } from '@/Events/BaseEvent';

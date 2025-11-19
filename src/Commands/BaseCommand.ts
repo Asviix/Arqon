@@ -20,6 +20,7 @@ export interface CommandContext {
  */
 export abstract class Command {
     public abstract cooldown: number;
+    public abstract category: string | null;
     public abstract commandData: 
         SlashCommandBuilder | 
         SlashCommandSubcommandsOnlyBuilder | 
