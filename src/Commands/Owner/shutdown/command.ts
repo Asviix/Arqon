@@ -6,12 +6,13 @@ import { isOwner } from "@/Utils/Permissions";
 import { Logger } from "@/Utils/Logger";
 
 export default class ShutdownCommand extends Command {
-    public cooldown = 0;
+    public cooldown: number = 0;
+    public category: string | null = 'Owner';
 
     public commandData = new SlashCommandBuilder()
         .setName('shutdown')
         .setDescription('Shuts down the bot process.')
-        .setContexts(InteractionContextType.Guild)
+        .setContexts(InteractionContextType.Guild) as SlashCommandBuilder;
 
     public async execute({client, interaction, languageCode}: CommandContext): Promise<void | InteractionResponse> {
         

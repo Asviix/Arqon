@@ -4,8 +4,9 @@ import { EmbedBuilder, InteractionContextType, MessageFlags, SlashCommandBuilder
 import { Command, CommandContext } from '@/Commands/BaseCommand';
 import { runMethod } from "./subCommands/manager";
 
-export default class hltvCommand extends Command {
-    public cooldown = 5;
+export default class HLTVCommand extends Command {
+    public cooldown: number = 5;
+    public category: string | null = null
 
     public commandData = new SlashCommandBuilder()
         .setName('hltv')
@@ -54,7 +55,7 @@ export default class hltvCommand extends Command {
                     .setAutocomplete(true)
                 )
             )
-        )
+        ) as SlashCommandBuilder;
     
     public async execute({client, interaction, languageCode}: CommandContext) {
 
@@ -91,7 +92,7 @@ export default class hltvCommand extends Command {
             };
         };
 
-        interaction.followUp({
+        await interaction.followUp({
             embeds: [returnEmbed]
         });
     };

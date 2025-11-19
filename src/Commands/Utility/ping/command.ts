@@ -1,16 +1,17 @@
 // src\Commands\ping\pingCommand\command.ts
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
-import { Command, CommandContext } from '../BaseCommand'
+import { Command, CommandContext } from '@/Commands/BaseCommand'
 import { createPingEmbed } from './services/embedsGenerator';
 
 export default class PingCommand extends Command {
-    public cooldown = 5;
+    public cooldown: number = 5;
+    public category: string | null = 'Utility'
 
     public commandData = new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Replies with Pong! (and checks the latency).')
-        .setContexts(InteractionContextType.Guild);
+        .setContexts(InteractionContextType.Guild) as SlashCommandBuilder;
 
     public async execute({client, interaction, languageCode}: CommandContext) {
 
