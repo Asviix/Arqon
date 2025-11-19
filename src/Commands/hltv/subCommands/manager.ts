@@ -2,7 +2,6 @@
 
 import { EmbedBuilder } from "discord.js";
 import { CommandContext } from '@/Commands/BaseCommand';
-import { createTranslator } from "@/Locales/TranslatorHelper";
 import { getLiveMatches } from "./live/methods/live";
 import { getPlayerStats } from "./playerStats/methods/playerStats";
 import { Logger } from "@/Utils/Logger";
@@ -14,13 +13,13 @@ const methodRegistry: Record<string, HLTVMethod> = {
     'stats': getPlayerStats
 };
 
-export function runMethod(context: CommandContext, method: string, ...args: any[]): Promise<EmbedBuilder> {
-    const _ = createTranslator(context.client, context.languageCode)
+export function runMethod(c: CommandContext, method: string, ...args: any[]): Promise<EmbedBuilder> {
+    const _ = c._;
     const methodFunction = methodRegistry[method];
 
     if (!methodFunction) {
-        const title = _("COMMAND_HLTV_MANAGER_ERROR1_TITLE");
-        const description = _("COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION", {
+        const title = _.COMMAND_HLTV_MANAGER_ERROR1_TITLE();
+        const description = _.COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION({
             method: method
         });
 
@@ -33,7 +32,7 @@ export function runMethod(context: CommandContext, method: string, ...args: any[
     };
 
     try {
-        return methodFunction(context, ...args);
+        return methodFunction(c, ...args);
     } catch (error) {
         Logger.error(`Error executing HLTV method "${method}":\n`, error);
         return Promise.reject(error);

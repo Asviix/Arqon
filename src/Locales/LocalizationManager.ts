@@ -9,6 +9,8 @@ import { Logger } from '@/Utils/Logger';
 // 1. Updated Interface: Keys can be a simple string OR a function (for parameterized messages)
 export type LocalizationValue = string | ((...args: any[]) => string);
 
+export const DEFAULT_LOCALE = 'en-US';
+
 export interface LocaleStrings {
     // Maps locale code (e.g., 'en-US') to a key-value object
     [localeCode: string]: Record<LocalizationKeys, LocalizationValue>;
@@ -21,16 +23,6 @@ export class LocalizationManager {
         this.client = client;
     };
 
-    public DEFAULT_LOCALE = 'en-US';
-
-    // REMOVED: The public getString method is no longer needed. 
-    // The t alias handles accessing the function and passing arguments.
-
-    /**
-     * Loads all localization files from the locales directory using dynamic import().
-     * This loads the compiled JavaScript files that export the localization objects.
-     * @returns A promise resolving to the object mapping locale codes to their strings/functions.
-     */
     public async loadLocales(): Promise<LocaleStrings> {
         Logger.debug('Loading locales...');
         
@@ -72,7 +64,7 @@ export class LocalizationManager {
     public translate(languageCode: string, key: LocalizationKeys, ...args: any[]): string {
         const translator =
             this.client.locales[languageCode]?.[key]
-            || this.client.locales[this.DEFAULT_LOCALE]?.[key];
+            || this.client.locales[DEFAULT_LOCALE]?.[key];
 
         if (!translator) {
             return `[MISSING STRING: ${languageCode}.${key}]`;

@@ -57,9 +57,9 @@ export default class HLTVCommand extends Command {
             )
         ) as SlashCommandBuilder;
     
-    public async execute({client, interaction, languageCode}: CommandContext) {
+    public async execute(c: CommandContext) {
 
-        await interaction.deferReply({
+        await c.interaction.deferReply({
             flags: MessageFlags.Ephemeral
         });
 
@@ -68,31 +68,31 @@ export default class HLTVCommand extends Command {
             .setDescription('Test2')
             .setColor('Aqua')
 
-        const subCommandGroup = interaction.options.getSubcommandGroup();
+        const subCommandGroup = c.interaction.options.getSubcommandGroup();
 
         if (subCommandGroup) {
-            const subCommand = interaction.options.getSubcommand();
+            const subCommand = c.interaction.options.getSubcommand();
             switch (subCommandGroup) {
                 case 'player':
                     switch (subCommand) {
                         case 'stats':
-                            const playerName = interaction.options.getString('name');
-                            const gameVersion = interaction.options.getString('game_version');
-                            const matchType = interaction.options.getString('match_type');
-                            const mapInput = interaction.options.getString('maps');
-                            returnEmbed = await runMethod({client, interaction, languageCode}, subCommand, playerName, gameVersion, matchType, mapInput);
+                            const playerName = c.interaction.options.getString('name');
+                            const gameVersion = c.interaction.options.getString('game_version');
+                            const matchType = c.interaction.options.getString('match_type');
+                            const mapInput = c.interaction.options.getString('maps');
+                            returnEmbed = await runMethod(c, subCommand, playerName, gameVersion, matchType, mapInput);
                     };
             };
 
         } else {
-            const subCommand = interaction.options.getSubcommand();
+            const subCommand = c.interaction.options.getSubcommand();
             switch (subCommand) {
                 case 'live':
-                    returnEmbed = await runMethod({client, interaction, languageCode}, subCommand);
+                    returnEmbed = await runMethod(c, subCommand);
             };
         };
 
-        await interaction.followUp({
+        await c.interaction.followUp({
             embeds: [returnEmbed]
         });
     };

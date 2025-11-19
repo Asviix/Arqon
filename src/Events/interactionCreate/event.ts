@@ -15,7 +15,6 @@ export default class InteractionCreateEvent extends EventHandler {
     public async execute(client: BotClient, interaction: Interaction): Promise<void> {
 
         const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
-
         const _ = createTranslator(client, languageCode);
 
         const VALID_MAPS: string[] = ['de_ancient', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_anubis', 'de_cache', 'de_cobblestone', 'de_season', 'de_tuscan', 'de_vertigo'];
@@ -48,37 +47,36 @@ export default class InteractionCreateEvent extends EventHandler {
             Logger.error(`Command not found: /${interaction.commandName}`);
             await interaction.reply(
                 {
-                    content: _('BASE_ERROR_COMMAND_NOT_FOUND'),
+                    content: _.BASE_ERROR_COMMAND_NOT_FOUND(),
                     flags:MessageFlags.Ephemeral
                 }
             );
             return;
         };
 
-        const context: CommandContext = {
+        const c: CommandContext = {
             client,
             interaction,
-            languageCode
+            languageCode,
+            _
         }
 
         try {
             const [userInCooldown, remaining] = await isCooldown(client, interaction.user.id, command);
 
             if (userInCooldown) {
-                responseText = _('COOLDOWN',
-                    {
-                        'seconds': remaining.toString(),
-                        'commandName': command.name
-                    }
-                );
+                responseText = _.COOLDOWN({
+                    seconds: remaining.toString(),
+                    commandName: interaction.commandName
+                });
 
                 return await interactionErrorReply(responseText, interaction);
             };
             client.sessionCounters.commandsRan += 1;
 
-            await command.execute(context);
+            await command.execute(c);
         } catch (error) {
-            responseText = _('ERROR_GENERIC');
+            responseText = _.ERROR_GENERIC();
 
             interactionErrorReply(responseText, interaction);
 
