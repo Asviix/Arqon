@@ -26,7 +26,7 @@ _TO ADD BEFORE PUSHING TO MAIN_
 - Small change of how `/ping (command.ts)` checks for edge-cases on the Uptime variable.
 - Refactored imports in all files to include a named path for better readability and maintainability. ([`c9197`](https://github.com/Asviix/Arqon/commit/c9197dea0ebefa31936df35a28269c2d678e8807))
 - Other small changes.
-- Ordered import names alphabetically. [`#2`]
+- Ordered import names alphabetically. ([`#2`](https://github.com/Asviix/Arqon/pull/2))
 
 #### **GitHub**
 
