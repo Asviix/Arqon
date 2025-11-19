@@ -1,20 +1,31 @@
-// src\Locales\TranslatorHelper.ts
+// src/Locales/TranslatorHelper.ts
 
 import { BotClient } from '@/Client/BotClient';
 import { LocalizationKeys } from './keys';
+import { LocaleArgsMap } from './interfaces';
+import { DEFAULT_LOCALE } from './LocalizationManager';
 
-/**
- * Creates a locally bound 't' (translate) function for use in a command file.
- * This simplifies the call from client.localizationManager.translate(locale, key, args...)
- * to just t(key, args...).
- * @param client The BotClient instance.
- * @param languageCode The locale to bind (usually interaction.locale).
- * @returns A bound function 't' for easy translation.
- */
-export function createTranslator(client: BotClient, languageCode: string): (key: LocalizationKeys, ...args: any[]) => string {
+type ArgRequiredKeys = { 
+    [K in LocalizationKeys]: LocaleArgsMap[K] extends void ? never : K 
+}[LocalizationKeys];
+
+type NoArgKeys = Exclude<LocalizationKeys, ArgRequiredKeys>;
+
+export type BoundTranslatorObject = {
+    [K in NoArgKeys]: (args?: void) => string;
+} & {
+    [K in ArgRequiredKeys]: (args: LocaleArgsMap[K]) => string;
+};
+
+export function createTranslator(client: BotClient, languageCode: string): BoundTranslatorObject {
     
-    // Return a function that is bound to the client and languageCode arguments.
-    return (key: LocalizationKeys, ...args: any[]) => {
-        return client.localizationManager.translate(languageCode, key, ...args);
-    };
+    const boundObject: Partial<BoundTranslatorObject> = {};
+
+    for (const key of Object.keys(client.locales[languageCode] || client.locales[DEFAULT_LOCALE])) {
+        boundObject[key as LocalizationKeys] = (args: any) => {
+             return client.localizationManager.translate(languageCode, key as LocalizationKeys, args);
+        };
+    }
+
+    return boundObject as BoundTranslatorObject;
 }

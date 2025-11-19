@@ -8,12 +8,14 @@ import {
 } from 'discord.js';
 
 import { BotClient } from '@/Client/BotClient';
+import { BoundTranslatorObject } from '@/Locales/TranslatorHelper';
 
 export interface CommandContext {
-    client: BotClient,
-    interaction: ChatInputCommandInteraction,
-    languageCode: string
-}
+    readonly client: BotClient,
+    readonly interaction: ChatInputCommandInteraction,
+    readonly languageCode: string,
+    readonly _: BoundTranslatorObject;
+};
 
 /**
  * The base class for all application commands.

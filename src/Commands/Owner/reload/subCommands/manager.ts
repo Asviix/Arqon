@@ -11,7 +11,7 @@ const methodRegistry: Record<string, ReloadMethod> = {
     'command': reloadCommand
 };
 
-export function runMethod(context: CommandContext, method: string, ...args: any[]): Promise<InteractionReplyOptions> {
+export function runMethod(c: CommandContext, method: string, ...args: any[]): Promise<InteractionReplyOptions> {
     const methodFunction = methodRegistry[method];
 
     if (!methodFunction) {
@@ -23,7 +23,7 @@ export function runMethod(context: CommandContext, method: string, ...args: any[
     };
 
     try {
-        return methodFunction(context, ...args);
+        return methodFunction(c, ...args);
     } catch (error) {
         Logger.error(`Error executing Reload method "${method}":\n`, error);
         return Promise.reject(error);

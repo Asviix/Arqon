@@ -7,7 +7,7 @@ import { CommandContext } from '@/Commands/BaseCommand';
 import { createMatchEmbed } from '../services/embedsGenerator';
 import { liveMatchesHTMLData as htmlData } from '../data/htmlScrapeData';
 
-export async function getLiveMatches(context: CommandContext): Promise<EmbedBuilder> {
+export async function getLiveMatches(c: CommandContext): Promise<EmbedBuilder> {
     
     const page = await browserService.getNewPage();
 
@@ -60,7 +60,7 @@ export async function getLiveMatches(context: CommandContext): Promise<EmbedBuil
         });
     });
 
-    const liveMatchesEmbed = createMatchEmbed(context, matchesData);
+    const liveMatchesEmbed = createMatchEmbed(c, matchesData);
 
     await page.close();
     return liveMatchesEmbed;
