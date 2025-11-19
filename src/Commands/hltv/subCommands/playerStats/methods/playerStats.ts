@@ -1,4 +1,4 @@
-// src\Commands\hltv\methods\playerStats.ts
+// src\Commands\hltv\subCommands\playerStats\methods\playerStats.ts
 
 import { EmbedBuilder } from 'discord.js';
 import * as cheerio from 'cheerio';

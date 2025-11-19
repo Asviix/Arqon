@@ -2,7 +2,7 @@
 
 import { EmbedBuilder, InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { Command, CommandContext } from '@/Commands/BaseCommand';
-import { runMethod } from "./methods/manager";
+import { runMethod } from "./subCommands/manager";
 
 export default class hltvCommand extends Command {
     public cooldown = 5;

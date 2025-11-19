@@ -3,8 +3,8 @@
 import { EmbedBuilder } from "discord.js";
 import { CommandContext } from '@/Commands/BaseCommand';
 import { createTranslator } from "@/Locales/TranslatorHelper";
-import { getLiveMatches } from "./live";
-import { getPlayerStats } from "./playerStats";
+import { getLiveMatches } from "./live/methods/live";
+import { getPlayerStats } from "./playerStats/methods/playerStats";
 import { Logger } from "@/Utils/Logger";
 
 type HLTVMethod = (...args: any[]) => Promise<EmbedBuilder>;

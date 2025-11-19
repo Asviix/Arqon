@@ -1,4 +1,4 @@
-// src\Commands\hltv\methods\live.ts
+// src\Commands\hltv\methods\live\methods\live.ts
 
 import { EmbedBuilder } from 'discord.js';
 import * as cheerio from 'cheerio';
@@ -15,11 +15,6 @@ export async function getLiveMatches(context: CommandContext): Promise<EmbedBuil
         waitUntil: 'networkidle2',
         referer: 'https://www.hltv.org',
         timeout: 10000
-    });
-
-    await page.waitForSelector(htmlData.liveMatchDiv, { 
-        visible: true,
-        timeout: 5000
     });
     
     const html = await page.content();
