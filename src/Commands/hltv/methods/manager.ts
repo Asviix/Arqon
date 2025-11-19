@@ -5,6 +5,7 @@ import { Logger } from "@/Utils/Logger";
 import { CommandContext } from '@/Commands/BaseCommand';
 import { getLiveMatches } from "./live";
 import { getPlayerStats } from "./playerStats";
+import { createTranslator } from "@/Locales/TranslatorHelper";
 
 type HLTVMethod = (...args: any[]) => Promise<EmbedBuilder>;
 
@@ -14,11 +15,12 @@ const methodRegistry: Record<string, HLTVMethod> = {
 };
 
 export function runMethod(context: CommandContext, method: string, ...args: any[]): Promise<EmbedBuilder> {
+    const _ = createTranslator(context.client, context.languageCode)
     const methodFunction = methodRegistry[method];
 
     if (!methodFunction) {
-        const title = context.client.localizationManager.getString(context.languageCode, "COMMAND_HLTV_MANAGER_ERROR1_TITLE");
-        const description = context.client.localizationManager.getString(context.languageCode, "COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION", {
+        const title = _("COMMAND_HLTV_MANAGER_ERROR1_TITLE");
+        const description = _("COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION", {
             method: method
         });
 

@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.0.3 -
+## 0.0.3 - FILL OUT DATE BEFORE PUSHING THE MAIN
 
-__
+_TO ADD BEFORE PUSHING TO MAIN_
 
 ### Added
 
@@ -11,6 +11,14 @@ __
 - Added the `/hltv player stats <playerName>` command, to retrieve the stats of any player on HTLV using their nickname. ([`#1`](https://github.com/Asviix/Arqon/issues/1))
 
 ### Changed
+
+#### **Localization:**
+
+- Complete rework of the localizations and its methods:
+  - **Architectural Upgrade:** Switched from fragile JSON files to **TypeScript modules (.ts)**, allowing dynamic import ans full native language support.
+  - **Improved Developper Experience (DX):** Created the highly compact `_()` (underscore) alias for translation, reducing verbose calls like `client.localizationManager.getString()`.
+  - **Enhanced Type Safety:** Parameterized strings now use a **strong, structured object model** (instead of positional arguments) defined in a central `interfaces.ts` file. This guarantees that every translation call is correct and self-documenting, eliminating argument order errors and providing IntelliSense for placeholder keys.
+  - **Dynamic Loading:** The system now intelligently detects whether the code is running via `ts-node` **or compiled JavaScript**, automatically loading the correct source files and ensuring seamless deployment.
 
 #### **Refactoring:**
 

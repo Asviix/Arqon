@@ -6,6 +6,8 @@ import { EventHandler } from "@/Events/BaseEvent";
 import { Interaction, MessageFlags } from "discord.js";
 import { interactionErrorReply, isCooldown} from "./methods";
 import { CommandContext } from "@/Commands/BaseCommand";
+import { LocalizationKeys } from "@/Locales/keys";
+import { createTranslator } from "@/Locales/TranslatorHelper";
 
 export default class InteractionCreateEvent extends EventHandler {
     public name = 'interactionCreate';
@@ -14,6 +16,8 @@ export default class InteractionCreateEvent extends EventHandler {
     public async execute(client: BotClient, interaction: Interaction): Promise<void> {
 
         const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
+
+        const _ = createTranslator(client, languageCode);
 
         const VALID_MAPS: string[] = ['de_ancient', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_anubis', 'de_cache', 'de_cobblestone', 'de_season', 'de_tuscan', 'de_vertigo'];
 
@@ -45,7 +49,7 @@ export default class InteractionCreateEvent extends EventHandler {
             Logger.error(`Command not found: /${interaction.commandName}`);
             await interaction.reply(
                 {
-                    content: client.localizationManager.getString(languageCode, 'BASE_ERROR_COMMAND_NOT_FOUND'),
+                    content: _('BASE_ERROR_COMMAND_NOT_FOUND'),
                     flags:MessageFlags.Ephemeral
                 }
             );
@@ -62,7 +66,7 @@ export default class InteractionCreateEvent extends EventHandler {
             const [userInCooldown, remaining] = await isCooldown(client, interaction.user.id, command);
 
             if (userInCooldown) {
-                responseText = client.localizationManager.getString(languageCode, 'COOLDOWN', 
+                responseText = _('COOLDOWN',
                     {
                         'seconds': remaining.toString(),
                         'commandName': command.name
@@ -75,7 +79,7 @@ export default class InteractionCreateEvent extends EventHandler {
 
             await command.execute(context);
         } catch (error) {
-            responseText = client.localizationManager.getString(languageCode, 'ERROR_GENERIC');
+            responseText = _('ERROR_GENERIC');
 
             interactionErrorReply(responseText, interaction);
 

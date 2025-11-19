@@ -2,6 +2,7 @@
 
 import { EmbedBuilder } from "discord.js";
 import { CommandContext } from "@/Commands/BaseCommand";
+import { createTranslator } from "@/Locales/TranslatorHelper";
 
 interface Match {
     matchLink: string,
@@ -16,14 +17,15 @@ interface Match {
 }
 
 function createMatchFields(context: CommandContext, matchesData: Match[]): { name: string, value: string, inline: boolean }[] {
-    const LMA = context.client.localizationManager;
+    const _ = createTranslator(context.client, context.languageCode);
     return matchesData.map((match: Match) => {
-        const name = LMA.getString(context.languageCode, 'COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME', {
+        const name = _('COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME', {
             meta: match.meta.toUpperCase(),
             team1: match.team1,
             team2: match.team2
         });
-        const value = LMA.getString(context.languageCode, 'COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE', {
+
+        const value = _('COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE', {
             event: match.event,
             currentScore1: match.currentScore1.replace('-', '0'),
             currentScore2: match.currentScore2.replace('-', '0'),
@@ -42,9 +44,9 @@ function createMatchFields(context: CommandContext, matchesData: Match[]): { nam
 
 
 export function createMatchEmbed(context: CommandContext, matchesData: Match[]): EmbedBuilder {
-    const LMA = context.client.localizationManager;
-    const title: string = LMA.getString(context.languageCode, 'COMMAND_HLTV_LIVE_MATCHES_EMBED_TITLE');
-    const description: string = LMA.getString(context.languageCode, 'COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION', {
+    const _ = createTranslator(context.client, context.languageCode);
+    const title: string = _('COMMAND_HLTV_LIVE_MATCHES_EMBED_TITLE');
+    const description: string = _('COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION', {
         matches: matchesData.length.toString()
     });
 
@@ -83,22 +85,22 @@ interface Stats {
 }
 
 export function createStatsEmbed(context: CommandContext, stats: Stats): EmbedBuilder {
-    const LMA = context.client.localizationManager;
-    const description = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION', {
+    const _ = createTranslator(context.client, context.languageCode);
+    const description = _('COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION', {
         'filters': stats.filters.length > 0 ? stats.filters.join(', ') : 'None.',
         'mapCount': stats.mapCount
     });
 
-    const ratingsFieldName = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_NAME');
-    const ratingsFieldValue = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE', {
+    const ratingsFieldName = _('COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_NAME');
+    const ratingsFieldValue = _('COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE', {
         'ctRating': stats.ctRating,
         'tRating': stats.tRating,
         'boxRatingType': stats.boxRatingType,
         'boxRating': stats.boxRating
     });
 
-    const metricsFieldName = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_NAME');
-    const metricsFieldValue = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE', {
+    const metricsFieldName = _('COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_NAME');
+    const metricsFieldValue = _('COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE', {
         'roundSwing': stats.roundSwing,
         'deathPerRound': stats.deathPerRound,
         'kast': stats.kast,
@@ -107,8 +109,8 @@ export function createStatsEmbed(context: CommandContext, stats: Stats): EmbedBu
         'kpr': stats.kpr
     });
 
-    const roleFieldName = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_NAME');
-    const roleFieldValue = LMA.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE', {
+    const roleFieldName = _('COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_NAME');
+    const roleFieldValue = _('COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE', {
         'firepowerRating': stats.firepowerRating,
         'entryingRating': stats.entryingRating,
         'tradingRating': stats.entryingRating,

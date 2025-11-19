@@ -7,6 +7,7 @@ import { HLTV_PLAYER_IDS as playerIds } from '@/Config/hltvPlayerDatabase';
 import { EmbedBuilder } from 'discord.js';
 import { CommandContext } from '@/Commands/BaseCommand';
 import { createStatsEmbed } from '../services/embedsGenerator';
+import { createTranslator } from '@/Locales/TranslatorHelper';
 
 export async function getPlayerStats(context: CommandContext, playerName: string, gameVersion: string, matchType: string, mapInput: string): Promise<EmbedBuilder> {
     const page = await browserService.getNewPage();
@@ -17,18 +18,19 @@ export async function getPlayerStats(context: CommandContext, playerName: string
     mapInput ? filters.push(mapInput) : ''
 
     if (mapInput) {
+        const _ = createTranslator(context.client, context.languageCode);
         const VALID_MAPS: string[] = ['de_ancient', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_anubis', 'de_cache', 'de_cobblestone', 'de_season', 'de_tuscan', 'de_vertigo'];
         const mapArray = mapInput.split(',').map(map => map.trim()).filter(map => map.length > 0);
         const invalidMaps = mapArray.filter(map => !VALID_MAPS.includes(map));
         
         if (invalidMaps.length > 0) {
             return new EmbedBuilder()
-                .setTitle(context.client.localizationManager.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_TITLE'))
+                .setTitle(_('COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_TITLE'))
                 .setColor(context.client.embedOrangeColor)
                 .addFields(
                     {
-                        name: context.client.localizationManager.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_FIELD_NAME'),
-                        value: context.client.localizationManager.getString(context.languageCode, 'COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_FIELD_VALUE'),
+                        name: _('COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_FIELD_NAME'),
+                        value: _('COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_FIELD_VALUE'),
                     }
                 )
                 .setTimestamp();
