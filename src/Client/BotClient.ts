@@ -1,14 +1,14 @@
 // src\Client\BotClient.ts
 
 import { Client, Collection, ClientOptions, ColorResolvable } from 'discord.js';
-import { Command } from '@/Commands/BaseCommand';
-import { EventHandler } from '@/Events/BaseEvent';
-import { LocaleStrings, LocalizationManager } from '@/Locales/LocalizationManager';
-import { ConfigManager } from '@/Managers/ConfigManager';
-import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
-import { browserService } from '@/Utils/BrowserService';
-import { Logger } from '@/Utils/Logger';
 import { v4 as uuidv4 } from 'uuid';
+import { browserService } from '@/Utils/BrowserService';
+import { EventHandler } from '@/Events/BaseEvent';
+import { ConfigManager } from '@/Managers/ConfigManager';
+import { Command } from '@/Commands/BaseCommand';
+import { LocaleStrings, LocalizationManager } from '@/Locales/LocalizationManager';
+import { Logger } from '@/Utils/Logger';
+import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
 
 /**
  * The BotClient class that extends client.

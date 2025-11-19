@@ -1,11 +1,11 @@
 // src\Commands\hltv\methods\live.ts
 
+import { EmbedBuilder } from 'discord.js';
 import * as cheerio from 'cheerio';
 import { browserService } from '@/Utils/BrowserService';
+import { CommandContext } from '@/Commands/BaseCommand';
 import { createMatchEmbed } from '../services/embedsGenerator';
 import { liveMatchesHTMLData as htmlData } from '../data/htmlScrapeData';
-import { EmbedBuilder } from 'discord.js';
-import { CommandContext } from '@/Commands/BaseCommand';
 
 export async function getLiveMatches(context: CommandContext): Promise<EmbedBuilder> {
     
