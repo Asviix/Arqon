@@ -28,6 +28,11 @@ export default class HLTVCommand extends Command {
                     .setDescription('The name of the player you want the stats of.')
                     .setRequired(true)
                 )
+                .addBooleanOption(ephemeral => ephemeral
+                    .setName('ephemeral')
+                    .setDescription('Whether you want to share it to the world! (Or not, we don\'t judge.')
+                    .setRequired(true)
+                )
                 .addStringOption(gameVersionOption => gameVersionOption
                     .setName('game_version')
                     .setDescription('The version of Counter-Strike to get.')
@@ -59,10 +64,6 @@ export default class HLTVCommand extends Command {
     
     public async execute(c: CommandContext) {
 
-        await c.interaction.deferReply({
-            flags: MessageFlags.Ephemeral
-        });
-
         let returnPayload: InteractionReplyOptions = {
             content: 'How did we get here ?'
         };
@@ -79,6 +80,14 @@ export default class HLTVCommand extends Command {
                             const gameVersion = c.interaction.options.getString('game_version');
                             const matchType = c.interaction.options.getString('match_type');
                             const mapInput = c.interaction.options.getString('maps');
+                            const ephemeral = c.interaction.options.getBoolean('ephemeral');
+                            if (ephemeral) {
+                                await c.interaction.deferReply({
+                                    flags: MessageFlags.Ephemeral
+                                });
+                            } else {
+                                await c.interaction.deferReply();
+                            };
                             returnPayload = await runMethod(c, subCommand, playerName, gameVersion, matchType, mapInput);
                     };
             };

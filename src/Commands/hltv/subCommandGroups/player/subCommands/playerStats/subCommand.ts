@@ -1,6 +1,7 @@
 //src/Commands/hltv/subCommands/playerStats/subCommand.ts
 
-import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
+import { AttachmentBuilder, EmbedBuilder, InteractionReplyOptions } from 'discord.js';
+import sharp from 'sharp';
 import * as cheerio from 'cheerio';
 import { CommandContext } from '@/Commands/BaseCommand';
 import { createStatsEmbed } from './services/embedsGenerator';
@@ -11,6 +12,17 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
     const _ = c._;
     let returnPayload: InteractionReplyOptions;
     const page = await c.client.browserService.getNewPage();
+    await page.setRequestInterception(true);
+
+    page.on('request', (request) => {
+        const url = request.url();
+
+        if (url.includes('consent.cookiebot.com')) {
+            request.abort();
+        } else {
+            request.continue();
+        };
+    });
 
     const filters: string[] = []
     gameVersion ? filters.push(gameVersion) : ''
@@ -44,7 +56,7 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
     let playerId: string;
     if (!Object.prototype.hasOwnProperty.call(ids, playerName.toLowerCase())) {
         await page.goto(`https://www.hltv.org/search?query=${playerName.toLowerCase()}`, {
-            waitUntil: 'networkidle2',
+            waitUntil: 'domcontentloaded',
             referer: 'https://www.htlv.org',
             timeout: 10000
         });
@@ -107,6 +119,82 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
         timeout: 10000
     });
 
+    const UNWANTED_SELECTORS = [
+        'div.player-summary-stat-box-right-top',
+        'a.player-summary-stat-box-left-btn',
+        'div.role-stats-filter-wrapper',
+        'div.role-stats-section-arrow'
+    ];
+
+    await page.evaluate((selectors) => {
+        for (const selector of selectors) {
+            const elements = document.querySelectorAll(selector);
+
+            elements.forEach(element => {
+                (element as HTMLElement).style.display = 'none'
+            });
+        }
+    }, UNWANTED_SELECTORS);
+
+    const NAME_WRAPPER = 'div.player-summary-stat-box-left-text-wrapper';
+
+    await page.evaluate((selectors) => {
+        for (const selector of selectors) {
+            const elements = document.querySelectorAll(selector);
+
+            elements.forEach(element => {
+                (element as HTMLElement).style.bottom = '10px'
+            });
+        }
+    }, [NAME_WRAPPER]);
+
+    const topStatsElement = await page.waitForSelector(htmlData.topStatsContainer);
+    const topStatsImageBuffer = await topStatsElement?.screenshot({
+        type: 'png'
+    }) as Buffer;
+    const roleStatsElement = await page.waitForSelector(htmlData.roleStatsContainer);
+    const roleStatsImageBuffer = await roleStatsElement?.screenshot({
+        type: 'png'
+    }) as Buffer;
+
+    const topStatsMetadata = await sharp(topStatsImageBuffer).metadata();
+    const roleStatsMetadata = await sharp(roleStatsImageBuffer).metadata();
+
+
+    if (!topStatsMetadata.width || !topStatsMetadata.height || !roleStatsMetadata.height) {
+        throw new Error('Failed to get image dimensions for sharp composition.');
+    };
+
+    const totalHeight = topStatsMetadata.height + roleStatsMetadata.height;
+    const commonWidth = topStatsMetadata.width;
+
+    const combinedImageBuffer = await sharp({
+        create: {
+            width: commonWidth,
+            height: totalHeight,
+            channels: 4,
+            background: { r: 0, g: 0, b: 0, alpha: 0 }
+        }
+    })
+    .composite([
+        { 
+            input: topStatsImageBuffer, 
+            top: 0, 
+            left: 0 
+        },
+        { 
+            input: roleStatsImageBuffer, 
+            top: topStatsMetadata.height,
+            left: 0 
+        }
+    ])
+    .png()
+    .toBuffer();
+
+    const attachementName = 'htlv_player_card.png'
+    const fileAttachement = new AttachmentBuilder(combinedImageBuffer)
+        .setName(attachementName);
+
     const html = await page.content();
     const $ = cheerio.load(html);
 
@@ -114,61 +202,17 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
     const topStats = statsContainer.find(htmlData.topStatsContainer);
 
     // Player Info
-    const playerImageURL = statsContainer.find(htmlData.playerBodyShot).attr('src');
     const playerFullName = statsContainer.find(htmlData.playerBodyShot).attr('alt');
 
     // Map Count
     const mapCount = topStats.find(htmlData.mapCount).text().trim();
-
-    // Side Ratings
-    const sideRatings = topStats.find(htmlData.sideRating);
-    const tRating = sideRatings.eq(0).contents().eq(2).get(0) as Text | undefined;
-    const ctRating = sideRatings.eq(1).contents().eq(2).get(0) as Text | undefined;
-    const boxRating = topStats.find(htmlData.boxRating).text().trim();
-    const boxRatingType = topStats.find(htmlData.boxRatingType).eq(0).contents().eq(0).get(0) as Text | undefined;
-
-    // Performance Metrics
-    const performanceMetrics = topStats.find(htmlData.performanceMetrics);
-    const roundSwing = performanceMetrics.eq(0).children().eq(0).contents().eq(0).get(0) as Text | undefined;
-    const deathPerRound = performanceMetrics.eq(1).children().eq(0).text().trim();
-    const kast = performanceMetrics.eq(2).children().eq(0).contents().eq(0).get(0) as Text | undefined;
-    const multiKill = performanceMetrics.eq(3).children().eq(0).contents().eq(0).get(0) as Text | undefined;
-    const adr = performanceMetrics.eq(4).children().eq(0).text().trim();
-    const kpr = performanceMetrics.eq(5).children().eq(0).text().trim();
-
-    // Role Stats
-    const roleStats = statsContainer.find(htmlData.roleStatsScore);
-    const firepowerRating = roleStats.eq(0).contents().eq(0).get(0) as Text | undefined;
-    const entryingRating = roleStats.eq(3).contents().eq(0).get(0) as Text | undefined;
-    const tradingRating = roleStats.eq(6).contents().eq(0).get(0) as Text | undefined;
-    const openingRating = roleStats.eq(9).contents().eq(0).get(0) as Text | undefined;
-    const clutchingRating = roleStats.eq(12).contents().eq(0).get(0) as Text | undefined;
-    const snipingRating = roleStats.eq(15).contents().eq(0).get(0) as Text | undefined;
-    const utilityRating = roleStats.eq(18).contents().eq(0).get(0) as Text | undefined;
     
     const stats = {
         filters,
         statsUrl,
+        attachementName,
         playerName: playerFullName as string,
-        playerImageURL: playerImageURL as string,
-        mapCount,
-        tRating: tRating?.data.trim() as string,
-        ctRating: ctRating?.data.trim() as string,
-        boxRating,
-        boxRatingType: boxRatingType?.data.trim() as string,
-        roundSwing: roundSwing?.data.trim() as string,
-        deathPerRound,
-        kast: kast?.data.trim() as string,
-        multiKill: multiKill?.data.trim() as string,
-        adr,
-        kpr,
-        firepowerRating: firepowerRating?.data.trim() as string,
-        entryingRating: entryingRating?.data.trim() as string,
-        tradingRating: tradingRating?.data.trim() as string,
-        openingRating: openingRating?.data.trim() as string,
-        clutchingRating: clutchingRating?.data.trim() as string,
-        snipingRating: snipingRating?.data.trim() as string,
-        utilityRating: utilityRating?.data.trim() as string
+        mapCount
     };
 
     const playerStatsEmbed = createStatsEmbed(c, stats)
@@ -176,7 +220,8 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
     await page.close();
 
     returnPayload = {
-        embeds: [playerStatsEmbed]
+        embeds: [playerStatsEmbed],
+        files: [fileAttachement]
     };
 
     return returnPayload;
