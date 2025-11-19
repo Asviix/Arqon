@@ -1,11 +1,11 @@
 // src\Commands\hltv\methods\manager.ts
 
 import { EmbedBuilder } from "discord.js";
-import { Logger } from "@/Utils/Logger";
 import { CommandContext } from '@/Commands/BaseCommand';
+import { createTranslator } from "@/Locales/TranslatorHelper";
 import { getLiveMatches } from "./live";
 import { getPlayerStats } from "./playerStats";
-import { createTranslator } from "@/Locales/TranslatorHelper";
+import { Logger } from "@/Utils/Logger";
 
 type HLTVMethod = (...args: any[]) => Promise<EmbedBuilder>;
 

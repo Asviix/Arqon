@@ -2,9 +2,9 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Logger } from '@/Utils/Logger';
 import { BotClient } from '@/Client/BotClient';
 import { EventHandler } from '@/Events/BaseEvent';
+import { Logger } from '@/Utils/Logger';
 
 const isTypeScriptEnv = process.execArgv.join('').includes('ts-node');
 const expectedExtension = isTypeScriptEnv ? '.ts' : '.js';

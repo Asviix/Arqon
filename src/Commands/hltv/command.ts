@@ -1,7 +1,7 @@
 // src\Commands\hltv\command.ts
 
-import { Command, CommandContext } from '@/Commands/BaseCommand';
 import { EmbedBuilder, InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { Command, CommandContext } from '@/Commands/BaseCommand';
 import { runMethod } from "./methods/manager";
 
 export default class hltvCommand extends Command {

@@ -1,8 +1,8 @@
 // src\Events\clientReady\methods.ts
 
-import { Logger } from "@/Utils/Logger";
-import { BotClient } from "@/Client/BotClient";
 import { ActivityType, ClientUser, TextChannel } from "discord.js";
+import { BotClient } from "@/Client/BotClient";
+import { Logger } from "@/Utils/Logger";
 import { sendLogMessage_Embed } from './embeds';
 
 export async function clientReadyRunMethods(client: BotClient, name: string, type: ActivityType): Promise<void> {

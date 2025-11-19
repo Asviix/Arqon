@@ -1,9 +1,9 @@
 // src\Commands\owner\shutdownCommand\command.ts
 
-import { Logger } from "@/Utils/Logger";
+import { SlashCommandBuilder, InteractionContextType, InteractionResponse, MessageFlags } from "discord.js";
 import { Command, CommandContext } from "@/Commands/BaseCommand";
 import { isOwner } from "@/Utils/Permissions";
-import { SlashCommandBuilder, InteractionContextType, InteractionResponse, MessageFlags } from "discord.js";
+import { Logger } from "@/Utils/Logger";
 
 export default class ShutdownCommand extends Command {
     public cooldown = 0;
