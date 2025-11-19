@@ -1,11 +1,10 @@
-// src\Commands\reloadCommand\services\reloadModule.ts
+// src\Commands\Owner\reload\subCommands\command\services\reloadModule.ts
 
 import * as path from 'path';
+import { COMMANDS_BASE_DIR as commandsDir } from '@/index';
 import { Logger } from '@/Utils/Logger';
 
-export function getCommandFilePath(inputName: string, category: string | null, executionDir: string): string {
-    
-    const commandsDir = path.join(executionDir, '..', '..');
+export function getCommandFilePath(inputName: string, category: string | null): string {
 
     let filePath: string;
 
