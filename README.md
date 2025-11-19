@@ -15,7 +15,7 @@ _TO ADD BEFORE PUSHING TO MAIN_
 
 #### **Localization:**
 
-- Complete rework of the localizations and its methods: ([`223a3`](https://github.com/Asviix/Arqon/commit/223a327b8c626f57bce5061b939f317d32826e28))
+- Complete rework of the localizations and its methods: ([`223a3`](https://github.com/Asviix/Arqon/commit/223a327b8c626f57bce5061b939f317d32826e28)) & ([`#7`](https://github.com/Asviix/Arqon/pull/7))
   - **Architectural Upgrade:** Switched from fragile JSON files to **TypeScript modules (.ts)**, allowing dynamic import ans full native language support.
   - **Improved Developper Experience (DX):** Created the highly compact `_()` (underscore) alias for translation, reducing verbose calls like `client.localizationManager.getString()`.
   - **Enhanced Type Safety:** Parameterized strings now use a **strong, structured object model** (instead of positional arguments) defined in a central `interfaces.ts` file. This guarantees that every translation call is correct and self-documenting, eliminating argument order errors and providing IntelliSense for placeholder keys.
