@@ -1,12 +1,12 @@
-// src\Commands\hltv\subCommands\playerStats\methods\playerStats.ts
+//src/Commands/hltv/subCommands/playerStats/subCommand.ts
 
 import { EmbedBuilder } from 'discord.js';
 import * as cheerio from 'cheerio';
 import { browserService } from '@/Utils/BrowserService';
 import { CommandContext } from '@/Commands/BaseCommand';
-import { createStatsEmbed } from '../services/embedsGenerator';
+import { createStatsEmbed } from './services/embedsGenerator';
 import { HLTV_PLAYER_IDS as playerIds } from '@/Config/hltvPlayerDatabase';
-import { playerStatsHTMLData as htmlData } from '../data/htmlScrapeData';
+import { playerStatsHTMLData as htmlData } from './data/htmlScrapeData';
 
 export async function getPlayerStats(c: CommandContext, playerName: string, gameVersion: string, matchType: string, mapInput: string): Promise<EmbedBuilder> {
     const _ = c._;
