@@ -42,16 +42,15 @@ export default class HLTVCommand extends Command {
                         {name: 'CS2', value: 'CS2'}
                     )
                 )
-                .addStringOption(matchTypeOption => matchTypeOption
-                    .setName('match_type')
-                    .setDescription('The type of matches to include.')
+                .addStringOption(startDateOption => startDateOption
+                    .setName('start_date')
+                    .setDescription('Custom start date (YYYY-MM-DD). Requires end_date.')
                     .setRequired(false)
-                    .addChoices(
-                        {name: 'Majors', value: 'Majors'},
-                        {name: 'Big Events', value: 'BigEvents'},
-                        {name: 'LAN', value: 'Lan'},
-                        {name: 'Online', value: 'Online'}
-                    )
+                )
+                .addStringOption(endDateOption => endDateOption
+                    .setName('end_date')
+                    .setDescription('Custom end date (YYYY-MM-DD). Required start_date.')
+                    .setRequired(false)
                 )
                 .addStringOption(mapOption => mapOption
                     .setName('maps')
@@ -72,31 +71,29 @@ export default class HLTVCommand extends Command {
 
         if (subCommandGroup) {
             const subCommand = c.interaction.options.getSubcommand();
-            switch (subCommandGroup) {
-                case 'player':
-                    switch (subCommand) {
-                        case 'stats':
-                            const playerName = c.interaction.options.getString('name');
-                            const gameVersion = c.interaction.options.getString('game_version');
-                            const matchType = c.interaction.options.getString('match_type');
-                            const mapInput = c.interaction.options.getString('maps');
-                            const ephemeral = c.interaction.options.getBoolean('ephemeral');
-                            if (ephemeral) {
-                                await c.interaction.deferReply({
-                                    flags: MessageFlags.Ephemeral
-                                });
-                            } else {
-                                await c.interaction.deferReply();
-                            };
-                            returnPayload = await runMethod(c, subCommand, playerName, gameVersion, matchType, mapInput);
+            if (subCommandGroup === 'player') {
+                if (subCommand === 'stats') {
+                    const playerName = c.interaction.options.getString('name');
+                    const gameVersion = c.interaction.options.getString('game_version');
+                    const startDate = c.interaction.options.getString('start_date');
+                    const endDate = c.interaction.options.getString('end_date');
+                    const mapInput = c.interaction.options.getString('maps');
+                    const ephemeral = c.interaction.options.getBoolean('ephemeral');
+                    if (ephemeral) {
+                        await c.interaction.deferReply({
+                            flags: MessageFlags.Ephemeral
+                        });
+                    } else {
+                        await c.interaction.deferReply();
                     };
-            };
+                    returnPayload = await runMethod(c, subCommand, playerName, gameVersion, startDate, endDate, mapInput);
+                }
+            }
 
         } else {
             const subCommand = c.interaction.options.getSubcommand();
-            switch (subCommand) {
-                case 'live':
-                    returnPayload = await runMethod(c, subCommand);
+            if (subCommand === 'live') {
+                returnPayload = await runMethod(c, subCommand);
             };
         };
 

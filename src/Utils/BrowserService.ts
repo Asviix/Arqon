@@ -27,7 +27,7 @@ export class BrowserService {
         Logger.info('Starting headless browser...')
             this.browser = await puppeteer.launch({
                 headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                args: ['--no-sandbox'],
                 protocolTimeout: 180000,
                 defaultViewport: { width: 1920, height: 1080}
             });

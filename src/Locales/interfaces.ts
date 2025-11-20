@@ -8,11 +8,9 @@ export interface ParametrizedKeyMap {
     'COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION': a_COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION,
     'COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION': a_COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION,
     'COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME': a_COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME,
-    'COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE': a_COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE
+    'COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE': a_COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE,
+    'COMMAND_HLTV_PLAYER_STATS_EMBED_DESCRIPTION_RANGE': a_COMMAND_HLTV_PLAYER_STATS_EMBED_DESCRIPTION_RANGE,
     'COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION': a_COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION,
-    'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE': a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE,
-    'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE': a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE,
-    'COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE': a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE
 };
 
 export interface a_COOLDOWN {
@@ -49,35 +47,14 @@ export interface a_COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_VALUE {
     matchLink: string
 };
 
+export interface a_COMMAND_HLTV_PLAYER_STATS_EMBED_DESCRIPTION_RANGE {
+    startDate: string,
+    endDate: string
+};
+
 export interface a_COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION {
     filters: string,
     mapCount: string
-};
-
-export interface a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE {
-    ctRating: string,
-    tRating: string,
-    boxRatingType: string,
-    boxRating: string
-};
-
-export interface a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE {
-    roundSwing: string,
-    deathPerRound: string,
-    kast: string,
-    multikills: string,
-    adr: string,
-    kpr: string
-};
-
-export interface a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE {
-    firepowerRating: string,
-    entryingRating: string,
-    tradingRating: string,
-    openingRating: string,
-    clutchingRating: string,
-    snipingRating: string,
-    utilityRating: string
 };
 
 export type LocaleArgsMap = {

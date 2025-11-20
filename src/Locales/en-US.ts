@@ -33,15 +33,8 @@ export const en = {
     COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_TITLE: `Invalid parameters!`,
     COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_FIELD_NAME: `Make sure your map parameters follow this pattern:`,
     COMMAND_HTLV_PLAYER_STATS_INVALID_MAP_PARAMETERS_FIELD_VALUE: `\`map_1,map_2,map_3,etc...\`\nExample: \`de_ancient,de_mirage\``,
+    COMMAND_HLTV_PLAYER_STATS_EMBED_DESCRIPTION_RANGE: ({ startDate, endDate }: i.a_COMMAND_HLTV_PLAYER_STATS_EMBED_DESCRIPTION_RANGE) =>
+        `Range: **${startDate} - ${endDate}**`,
     COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION: ({ filters, mapCount }: i.a_COMMAND_HTLV_PLAYER_STATS_EMBED_DESCRIPTION) =>
-        `Filters: **${filters}**\nStats over ${mapCount}`,
-    COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_NAME: `Ratings`,
-    COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE: ({ ctRating, tRating, boxRatingType, boxRating }: i.a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_RATINGS_VALUE) =>
-        `CT Rating: **${ctRating}**\nT Rating: **${tRating}**\n${boxRatingType}: **${boxRating}**`,
-    COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_NAME: `Performance Metrics`,
-    COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE: ({ roundSwing, deathPerRound, kast, multikills, adr, kpr }: i.a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_METRICS_VALUE) =>
-        `Round Swing: **${roundSwing}**\nDeath Per Round: **${deathPerRound}**\nKAST: **${kast}**\nMulti-Kills: **${multikills}**\nADR: **${adr}**\nKPR: **${kpr}**`,
-    COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_NAME: `Role Ratings`,
-    COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE: ({ firepowerRating, entryingRating, tradingRating, openingRating, clutchingRating, snipingRating, utilityRating }: i.a_COMMAND_HTLV_PLAYER_STATS_EMBED_FIELD_ROLES_VALUE) =>
-        `Firepower: **${firepowerRating}/100**\nEntrying: **${entryingRating}/100**\nTrading: **${tradingRating}/100**\nOpening: **${openingRating}/100**\nClutching: **${clutchingRating}/100**\nSniping: **${snipingRating}/100**\nUtility: **${utilityRating}/100**`
+        `Filters: **${filters}**\nStats over ${mapCount}`
 };

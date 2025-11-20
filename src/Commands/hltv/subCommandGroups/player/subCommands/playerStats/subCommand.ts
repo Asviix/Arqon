@@ -6,11 +6,54 @@ import * as cheerio from 'cheerio';
 import { CommandContext } from '@/Commands/BaseCommand';
 import { createStatsEmbed } from './services/embedsGenerator';
 import { HLTV_PLAYER_IDS as playerIds } from '@/Config/hltvPlayerDatabase';
+import { HTTPResponse } from 'puppeteer';
 import { playerStatsHTMLData as htmlData } from './data/htmlScrapeData';
 
-export async function getPlayerStats(c: CommandContext, playerName: string, gameVersion: string, matchType: string, mapInput: string): Promise<InteractionReplyOptions> {
+export async function getPlayerStats(
+        c: CommandContext,
+        playerName: string,
+        gameVersion: string,
+        startDate: string,
+        endDate: string,
+        mapInput: string,):
+    Promise<InteractionReplyOptions> {
+
     const _ = c._;
     let returnPayload: InteractionReplyOptions;
+
+    if (/\s/.test(playerName)) {
+        returnPayload = {
+            content: 'The `name` parameter cannot include spaces or other whitespace!'
+        };
+    };
+
+    function isValidDateString(dateStr: string): boolean {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            return false;
+        };
+
+        const date = new Date(dateStr);
+
+        if (isNaN(date.getTime())) {
+            return false;
+        };
+
+        const [year, month, day] = dateStr.split('-').map(Number);
+    
+        return date.getFullYear() === year 
+            && date.getMonth() === month - 1
+            && date.getDate() === day;
+    };
+
+    if (startDate && endDate) {
+        if (!isValidDateString(startDate) || !isValidDateString(startDate)) {
+            returnPayload = {
+                content: 'Invalid date format or value. Please use YYYY-MM-DD.'
+            };
+            return returnPayload;
+        };
+    };
+
     const page = await c.client.browserService.getNewPage();
     await page.setRequestInterception(true);
 
@@ -26,8 +69,11 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
 
     const filters: string[] = []
     gameVersion ? filters.push(gameVersion) : ''
-    matchType ? filters.push(matchType) : ''
     mapInput ? filters.push(mapInput) : ''
+
+    const dateFilter: string[] = []
+    startDate ? dateFilter.push(startDate) : ''
+    endDate ? dateFilter.push(endDate) : '';
 
     if (mapInput) {
         const VALID_MAPS: string[] = ['de_ancient', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_anubis', 'de_cache', 'de_cobblestone', 'de_season', 'de_tuscan', 'de_vertigo'];
@@ -69,8 +115,22 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
 
         const tables = searchContainer.find('table.table')
         const statsUrlContent = tables.find('> tbody > tr:nth-child(2) > td > a').attr('href') as string;
+        if (!statsUrlContent) {
+            returnPayload = {
+                content: 'Your search returned no result.'
+            };
+            return returnPayload;
+        };
         const regex = /^\/player\/(\d+)\/([a-zA-Z0-9_-]+)$/
         const match = statsUrlContent.match(regex);
+
+        if (!match) {
+            returnPayload = {
+                content: 'Your search returned no result.'
+            };
+            return returnPayload;
+        };
+
         playerId = match![1];
         playerName = match![2];
 
@@ -91,8 +151,8 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
             queryParams.push(`csVersion=${gameVersion}`);
         };
 
-        if (matchType) {
-            queryParams.push(`matchType=${matchType}`);
+        if (startDate && endDate) {
+            queryParams.push(`startDate=${startDate}&endDate=${endDate}`);
         };
 
         if (mapInput) {
@@ -113,11 +173,34 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
         };
     };
 
-    await page.goto(statsUrl, {
+    const response: HTTPResponse | null = await page.goto(statsUrl, {
         waitUntil: 'networkidle2',
         referer: 'https://www.htlv.org',
         timeout: 10000
     });
+
+    if (!response) {
+        returnPayload = {
+            content: 'Navigation failed: Received no HTTP response from HTLV.'
+        };
+        return returnPayload;
+    };
+
+    const statusCode = response.status();
+
+    if (statusCode === 403) {
+        returnPayload = {
+            content: 'HLTV Blocked Request (403 Forbidden).'
+        };
+        return returnPayload;
+    };
+
+    if (statusCode >= 400) {
+        returnPayload = {
+            content: `HTLV Request Failed: HTTP Status ${statusCode}`
+        };
+        return returnPayload;
+    };
 
     const UNWANTED_SELECTORS = [
         'div.player-summary-stat-box-right-top',
@@ -209,6 +292,7 @@ export async function getPlayerStats(c: CommandContext, playerName: string, game
     
     const stats = {
         filters,
+        dateFilter,
         statsUrl,
         attachementName,
         playerName: playerFullName as string,
