@@ -17,10 +17,19 @@ export interface LocaleStrings {
 };
 
 export class LocalizationManager {
+    private static instance: LocalizationManager;
     private client: BotClient
 
-    constructor(client: BotClient) {
+    private constructor(client: BotClient) {
         this.client = client;
+    };
+
+    public static getInstance(client: BotClient): LocalizationManager {
+        if (!LocalizationManager.instance) {
+            Logger.debug('Creating LocalizationManager instance...');
+            LocalizationManager.instance = new LocalizationManager(client);
+        };
+        return LocalizationManager.instance;
     };
 
     public async loadLocales(): Promise<LocaleStrings> {

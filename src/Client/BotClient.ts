@@ -14,6 +14,7 @@ import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
  * The BotClient class that extends client.
  */
 export class BotClient extends Client {
+    private static instance: BotClient;
 
     // Interfaces
     public locales: LocaleStrings = {};
@@ -24,9 +25,9 @@ export class BotClient extends Client {
     public commands: Collection<string, Command> = new Collection();
     public eventFiles: Collection<string, EventHandler> = new Collection();
     public cooldowns: Collection<string, Collection<string, number>> = new Collection();
-    public db: MySQLClient;
-    public localizationManager: LocalizationManager;
-    public configManager: ConfigManager;
+    public db!: MySQLClient;
+    public localizationManager!: LocalizationManager;
+    public configManager!: ConfigManager;
     public browserService!: BrowserService;
 
     // Colors
@@ -40,18 +41,29 @@ export class BotClient extends Client {
         errorsLogged: 0
     };
 
-    constructor(options: ClientOptions) {
+    private constructor(options: ClientOptions) {
         super(options);
-        this.db = new MySQLClient(this);
-        this.localizationManager = new LocalizationManager(this);
-        this.configManager = new ConfigManager(this, this.db);
+    };
+
+    public static async getInstance(options: ClientOptions): Promise<BotClient> {
+        if (!BotClient.instance) {
+            Logger.debug('Creating BotClient instance...');
+            BotClient.instance = new BotClient(options);
+        };
+        return BotClient.instance;
     };
 
     public async start(token: string) {
-        await this.db.initializeSchema();
 
+        // Get the instances for singletons.
         this.browserService = BrowserService.getInstance();
+        this.db = MySQLClient.getInstance(this);
+        this.localizationManager = LocalizationManager.getInstance(this);
+        this.configManager = ConfigManager.getInstance(this, this.db);
+
+        // Initialize required services.
         await this.browserService.launchBrowser();
+        await this.db.initializeSchema();
 
         Logger.init(this)
 

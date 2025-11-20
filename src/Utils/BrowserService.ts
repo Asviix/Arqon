@@ -16,7 +16,7 @@ export class BrowserService {
 
     public static getInstance(): BrowserService {
         if (!BrowserService.instance) {
-            Logger.debug('Creating BrowserService instance...')
+            Logger.debug('Creating BrowserService instance...');
             BrowserService.instance = new BrowserService();
         };
         return BrowserService.instance;

@@ -22,10 +22,11 @@ export interface GuildConfig {
 };
 
 export class MySQLClient {
+    private static instance: MySQLClient
     private pool: mysql.Pool;
     private client: BotClient;
 
-    constructor(client: BotClient) {
+    private constructor(client: BotClient) {
         this.pool = mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
@@ -37,6 +38,14 @@ export class MySQLClient {
         });
         this.client = client;
         Logger.info('Database pool created.');
+    };
+
+    public static getInstance(client: BotClient): MySQLClient {
+        if (!MySQLClient.instance) {
+            Logger.debug('Creating MYSQLClient instance...')
+            MySQLClient.instance = new MySQLClient(client);
+        };
+        return MySQLClient.instance;
     };
 
     /**

@@ -23,16 +23,18 @@ if (!DISCORD_TOKEN || typeof DISCORD_TOKEN !== 'string') {
 };
 
 Logger.debug('Creating the BotClient...');
-const client = new BotClient({
+const clientOptions = {
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
     ],
-});
+};
 
 async function main() {
     Logger.info('Starting bot initalization...');
+
+    const client = await BotClient.getInstance(clientOptions);
 
     await new CommandHandler(client).load();
     await new EventLoadHandler(client).load();
