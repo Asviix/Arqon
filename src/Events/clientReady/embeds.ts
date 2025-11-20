@@ -18,8 +18,7 @@ export function sendLogMessage_Embed(data: sendLogMessage_EmbedData): EmbedBuild
             name: 'Arqon'
         })
         .addFields(
-            { name: `**Envrionment:**`, value: data.isProd ? 'Production' : 'Development' },
-            { name: `**Latency**`, value: `${data.latency}ms` },
+            { name: `**Environment:**`, value: data.isProd ? 'Production' : 'Development' },
             { name: `**Total Guilds:**`, value: `${data.guild_count}` }
         )
         .setTimestamp(data.startupTime);
