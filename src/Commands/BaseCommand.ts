@@ -4,22 +4,29 @@ import {
     ChatInputCommandInteraction,
     SlashCommandBuilder,
     InteractionResponse,
+    SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
 
-import { BotClient } from '../Client/BotClient';
+import { BotClient } from '@/Client/BotClient';
+import { BoundTranslatorObject } from '@/Utils/TranslatorHelper';
 
 export interface CommandContext {
-    client: BotClient,
-    interaction: ChatInputCommandInteraction,
-    languageCode: string
-}
+    readonly client: BotClient,
+    readonly interaction: ChatInputCommandInteraction,
+    readonly languageCode: string,
+    readonly _: BoundTranslatorObject;
+};
 
 /**
  * The base class for all application commands.
  */
 export abstract class Command {
     public abstract cooldown: number;
-    public abstract commandData: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+    public abstract category: string | null;
+    public abstract commandData: 
+        SlashCommandBuilder | 
+        SlashCommandSubcommandsOnlyBuilder | 
+        Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
 
     /**
      * The method that runs when the command is executed by a user.

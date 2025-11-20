@@ -1,18 +1,44 @@
 // src\Events\interactionCreate\event.ts
 
-import { Logger } from "../../Utils/Logger";
-import { BotClient } from "../../Client/BotClient";
-import { EventHandler } from "../BaseEvent";
-import { ChatInputCommandInteraction, Interaction, MessageFlags } from "discord.js";
+import { Interaction, MessageFlags } from "discord.js";
+import { BotClient } from "@/Client/BotClient";
+import { EventHandler } from "@/Events/BaseEvent";
+import { CommandContext } from "@/Commands/BaseCommand";
+import { createTranslator } from "@/Utils/TranslatorHelper";
 import { interactionErrorReply, isCooldown} from "./methods";
-import { CommandContext } from "../../Commands/BaseCommand";
+import { Logger } from "@/Utils/Logger";
 
 export default class InteractionCreateEvent extends EventHandler {
     public name = 'interactionCreate';
     public once = false
 
     public async execute(client: BotClient, interaction: Interaction): Promise<void> {
+
+        const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
+        const _ = createTranslator(client, languageCode);
+
+        const VALID_MAPS: string[] = ['de_ancient', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_anubis', 'de_cache', 'de_cobblestone', 'de_season', 'de_tuscan', 'de_vertigo'];
+
         let responseText: string;
+
+        if (interaction.isAutocomplete()) {
+            const focusedOption = interaction.options.getFocused(true);
+
+            if (focusedOption.name === 'maps') {
+                const fullInput = focusedOption.value;
+
+                const parts = fullInput.split(',');
+                const currentSearch = parts[parts.length - 1].trim().toLowerCase();
+
+                const filtered = VALID_MAPS
+                    .filter(map => map.toLowerCase().includes(currentSearch))
+                    .slice(0, 25);
+
+                await interaction.respond(
+                    filtered.map(map => ({ name: map, value: map}))
+                );
+            };
+        };
 
         if (!interaction.isChatInputCommand()) return;
 
@@ -21,39 +47,36 @@ export default class InteractionCreateEvent extends EventHandler {
             Logger.error(`Command not found: /${interaction.commandName}`);
             await interaction.reply(
                 {
-                    content: 'Error: Command not found.',
+                    content: _.BASE_ERROR_COMMAND_NOT_FOUND(),
                     flags:MessageFlags.Ephemeral
                 }
             );
             return;
         };
 
-        const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
-
-        const context: CommandContext = {
+        const c: CommandContext = {
             client,
             interaction,
-            languageCode
+            languageCode,
+            _
         }
 
         try {
             const [userInCooldown, remaining] = await isCooldown(client, interaction.user.id, command);
 
             if (userInCooldown) {
-                responseText = await client.localizationManager.getString(languageCode, 'COOLDOWN', 
-                    {
-                        'seconds': remaining.toString(),
-                        'commandName': command.name
-                    }
-                );
+                responseText = _.COOLDOWN({
+                    seconds: remaining.toString(),
+                    commandName: interaction.commandName
+                });
 
                 return await interactionErrorReply(responseText, interaction);
             };
             client.sessionCounters.commandsRan += 1;
 
-            await command.execute(context);
+            await command.execute(c);
         } catch (error) {
-            responseText = await client.localizationManager.getString(languageCode, 'ERROR_GENERIC');
+            responseText = _.ERROR_GENERIC();
 
             interactionErrorReply(responseText, interaction);
 

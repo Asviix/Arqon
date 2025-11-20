@@ -1,9 +1,8 @@
 // src\Events\interactionCreate\methods.ts
 
-import { Command } from "../../Commands/BaseCommand";
-import { BotClient } from "../../Client/BotClient";
 import { ChatInputCommandInteraction, Collection, MessageFlags } from "discord.js";
-
+import { BotClient } from "@/Client/BotClient";
+import { Command } from "@/Commands/BaseCommand";
 /**
  * Check if the user initiating the command is in cooldown for that command.
  * @param userId The user ID that initiated the interaction.

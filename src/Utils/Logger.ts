@@ -1,6 +1,6 @@
 // src\Utils\Logger.ts
 
-import { BotClient } from "../Client/BotClient";
+import { BotClient } from "@/Client/BotClient";
 
 /**
  * ANSI color codes for formatting terminal output.

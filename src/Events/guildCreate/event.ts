@@ -1,8 +1,8 @@
 // src\Events\guildCreate\event.ts
 
-import { BotClient } from "../../Client/BotClient";
-import { EventHandler } from "../BaseEvent";
 import { Guild } from "discord.js";
+import { BotClient } from "@/Client/BotClient";
+import { EventHandler } from "@/Events/BaseEvent";
 
 export default class GuildCreateEvent extends EventHandler {
     public name = 'guildCreate';

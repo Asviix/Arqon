@@ -1,6 +1,6 @@
 // src\Utils\Permissions.ts
 
-import { OWNER_IDS } from "../Config/Owners";
+import { OWNER_IDS } from "@/Config/Owners";
 
 /**
  * Checks if the given user ID is part of the owning team.

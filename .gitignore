@@ -1,5 +1,6 @@
 .env
 .dockerignore
+.markdownlint.jsonc
 commands.txt
 node_modules/
 dist/

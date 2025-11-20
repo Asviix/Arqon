@@ -1,11 +1,11 @@
 // src\Events\clientReady\event.ts
 
 import 'dotenv/config'
-import { Logger } from '../../Utils/Logger';
-import { BotClient } from '../../Client/BotClient';
-import { EventHandler } from '../BaseEvent';
 import { ActivityType, ApplicationCommandDataResolvable } from 'discord.js';
+import { BotClient } from '@/Client/BotClient';
 import { clientReadyRunMethods } from './methods';
+import { EventHandler } from '@/Events/BaseEvent';
+import { Logger } from '@/Utils/Logger';
 
 export default class ReadyEvent extends EventHandler {
     public name = 'clientReady';

@@ -3,11 +3,11 @@
 import { Browser, Page } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import { Logger } from "./Logger";
+import { Logger } from "@/Utils/Logger";
 
 puppeteer.use(StealthPlugin());
 
-class BrowserService {
+export class BrowserService {
     private static instance: BrowserService;
     private browser: Browser | null = null;
     private userAgent: string = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
@@ -16,7 +16,7 @@ class BrowserService {
 
     public static getInstance(): BrowserService {
         if (!BrowserService.instance) {
-            Logger.debug('Creating BrowserService instance...')
+            Logger.debug('Creating BrowserService instance...');
             BrowserService.instance = new BrowserService();
         };
         return BrowserService.instance;
@@ -27,8 +27,9 @@ class BrowserService {
         Logger.info('Starting headless browser...')
             this.browser = await puppeteer.launch({
                 headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                args: ['--no-sandbox'],
                 protocolTimeout: 180000,
+                defaultViewport: { width: 1920, height: 1080}
             });
         };
     };
@@ -50,5 +51,3 @@ class BrowserService {
         };
     };
 };
-
-export const browserService = BrowserService.getInstance();
