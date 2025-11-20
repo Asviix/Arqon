@@ -37,7 +37,7 @@ services:
         condition: service_healthy
     volumes:
       - ./phpmyadmin/config:/config
-      - ./pma_themes/boodark:/config/themes/boodark
+      - ./pma_themes/blueberry:/config/themes/blueberry
   
   app:
     build: .
