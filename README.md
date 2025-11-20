@@ -29,6 +29,7 @@ _TO ADD BEFORE PUSHING TO MAIN_
 - Other small changes.
 - Ordered import names alphabetically. ([`#2`](https://github.com/Asviix/Arqon/pull/2))
 - Converted `BotClient`, `LocalizationManager`, `ConfigManager`, and `MySQLClient` to the Singleton pattern to ensure a single, consistent instance and improve dependency management across the application. ([`#8`](https://github.com/Asviix/Arqon/issues/8))
+- Updated the hierarchy of Locales. ([``]())
 
 #### **GitHub**
 

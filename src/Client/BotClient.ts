@@ -6,7 +6,7 @@ import { BrowserService } from '@/Utils/BrowserService';
 import { EventHandler } from '@/Events/BaseEvent';
 import { ConfigManager } from '@/Managers/ConfigManager';
 import { Command } from '@/Commands/BaseCommand';
-import { LocaleStrings, LocalizationManager } from '@/Locales/LocalizationManager';
+import { LocaleStrings, LocalizationManager } from '@/Managers/LocalizationManager';
 import { Logger } from '@/Utils/Logger';
 import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
 

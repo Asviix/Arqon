@@ -18,7 +18,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 60s
+      start_period: 180s
   
   phpmyadmin:
     image: linuxserver/phpmyadmin
@@ -37,6 +37,7 @@ services:
         condition: service_healthy
     volumes:
       - ./phpmyadmin/config:/config
+      - ./pma_themes/boodark:/config/themes/boodark
   
   app:
     build: .

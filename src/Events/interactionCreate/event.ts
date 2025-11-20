@@ -4,7 +4,7 @@ import { Interaction, MessageFlags } from "discord.js";
 import { BotClient } from "@/Client/BotClient";
 import { EventHandler } from "@/Events/BaseEvent";
 import { CommandContext } from "@/Commands/BaseCommand";
-import { createTranslator } from "@/Locales/TranslatorHelper";
+import { createTranslator } from "@/Utils/TranslatorHelper";
 import { interactionErrorReply, isCooldown} from "./methods";
 import { Logger } from "@/Utils/Logger";
 

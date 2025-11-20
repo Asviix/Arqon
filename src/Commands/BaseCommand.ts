@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 
 import { BotClient } from '@/Client/BotClient';
-import { BoundTranslatorObject } from '@/Locales/TranslatorHelper';
+import { BoundTranslatorObject } from '@/Utils/TranslatorHelper';
 
 export interface CommandContext {
     readonly client: BotClient,
