@@ -1,4 +1,4 @@
-// src\Commands\ping\pingCommand\command.ts
+// src\Commands\Utility\ping\command.ts
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 import { Command, CommandContext } from '@/Commands/BaseCommand'
@@ -6,7 +6,7 @@ import { createPingEmbed } from './services/embedsGenerator';
 
 export default class PingCommand extends Command {
     public cooldown: number = 5;
-    public category: string | null = 'Utility'
+    public category: string | null = 'Utility';
 
     public commandData = new SlashCommandBuilder()
         .setName('ping')

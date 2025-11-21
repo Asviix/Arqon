@@ -16,7 +16,7 @@ export class ConfigManager {
 
     private constructor(client: BotClient, db: MySQLClient) {
         this.client = client;
-        this.db = db
+        this.db = db;
     };
 
     public static getInstance(client: BotClient, db: MySQLClient): ConfigManager {

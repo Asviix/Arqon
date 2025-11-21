@@ -2,14 +2,13 @@
 
 ## 0.0.3 - FILL OUT DATE BEFORE PUSHING THE MAIN
 
-_TO ADD BEFORE PUSHING TO MAIN_
-
 ### Added
 
 #### **Commands:**
 
 - Added the `/hltv player stats <playerName>` command, to retrieve the stats of any player on HTLV using their nickname. ([`#1`](https://github.com/Asviix/Arqon/issues/1))
 - Added the `/reload command <commandName>` command, exclusive to the bot managers, to improve DX, and allows for better structured **/Commands** folder. ([`#3`](https://github.com/Asviix/Arqon/pull/3))
+- Added the `/hltv <commandName>` command, to get help concerning any command the bot offers. ([`#10`](https://github.com/Asviix/Arqon/issues/10))
 
 ### Changed
 

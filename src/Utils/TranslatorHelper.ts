@@ -15,6 +15,8 @@ export type BoundTranslatorObject = {
     [K in NoArgKeys]: (args?: void) => string;
 } & {
     [K in ArgRequiredKeys]: (args: LocaleArgsMap[K]) => string;
+} & {
+    [key: string]: (args?: any) => string; 
 };
 
 export function createTranslator(client: BotClient, languageCode: string): BoundTranslatorObject {
