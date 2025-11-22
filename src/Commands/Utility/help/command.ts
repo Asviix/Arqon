@@ -20,8 +20,8 @@ export default class HelpCommand extends Command {
 
     public async execute (c: CommandContext) {
         const h = new HelpHandler(c);
-        const msgPayload = await h.main();
-        await c.interaction.reply(msgPayload);
-        h.dispose();
+
+        await c.interaction.reply(await h.main());
+        process.nextTick(() => h.dispose());
     };
 };
