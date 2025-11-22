@@ -2,7 +2,7 @@
 
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
 import { Command, CommandContext } from "@/Commands/BaseCommand";
-import { HelpHandler } from "@help/services/handler";
+import { HelpHandler } from "./services/handler";
 
 export default class HelpCommand extends Command {
     public cooldown: number = 5;

@@ -1,8 +1,9 @@
 // src\Commands\Utility\help\services\helpHandler.ts
 
-import { Command, CommandContext } from "@/Commands/BaseCommand";
 import { EmbedBuilder, InteractionReplyOptions, MessageFlags } from "discord.js";
-import { LocaleStrings } from "@help/types/types";
+import { Command, CommandContext } from "@/Commands/BaseCommand";
+import { LocaleStrings } from "../types";
+import { LocaleStringsEnum as lsm , HelpKeysEnum as hku} from "../enums";
 
 export class HelpHandler {
     private c: CommandContext;
@@ -19,7 +20,7 @@ export class HelpHandler {
             strings = await this.getLocaleStrings(command);
         } else if (typeof command === 'undefined') {
             return {
-                content: `This command does not exist!`,
+                content: this.c._.COMMAND_PING_ERROR_COMMAND_NO_EXIST(),
                 flags: MessageFlags.Ephemeral
             };
         };
@@ -34,15 +35,18 @@ export class HelpHandler {
         return await this.createReturnEmbed(strings);
     };
 
-    private async createReturnEmbed(strings: LocaleStrings): Promise<InteractionReplyOptions> {        
-        const [embedTitle, embedField1Name, embedField1Value] = strings;
+    private async createReturnEmbed(strings: LocaleStrings): Promise<InteractionReplyOptions> {
         const returnEmbed: EmbedBuilder = new EmbedBuilder()
-            .setTitle(embedTitle)
+            .setTitle(strings[lsm.embedTitle])
             .setColor(this.c.client.embedOrangeColor)
             .addFields(
                 {
-                    name: embedField1Name,
-                    value: embedField1Value
+                    name: strings[lsm.embedField1Name],
+                    value: strings[lsm.embedField1Value]
+                },
+                {
+                    name: strings[lsm.embedField2Name],
+                    value: strings[lsm.embedField2Value]
                 }
             ) as EmbedBuilder;
         return {
@@ -58,9 +62,12 @@ export class HelpHandler {
 
     private async getLocaleStrings(command: Command): Promise<LocaleStrings | undefined> {
         const localeKey: string[] = [];
-        localeKey.push(`COMMAND_${command.name.toUpperCase()}_HELP_EMBED_TITLE`);
-        localeKey.push(`COMMAND_${command.name.toUpperCase()}_HELP_EMBED_FIELD1_NAME`);
-        localeKey.push(`COMMAND_${command.name.toUpperCase()}_HELP_EMBED_FIELD1_VALUE`);
+
+        for (const key of Object.keys(hku)) {
+            if (isNaN(Number(key))) {
+                localeKey.push(`COMMAND_${command.name.toUpperCase()}_HELP_EMBED_${key}`);
+            };
+        };
 
         const resultStrings: string[] = [];
 
@@ -73,7 +80,7 @@ export class HelpHandler {
             };
         };
 
-        if (resultStrings.length === 3) {
+        if (resultStrings.length === Object.keys(hku).length / 2) {
             return resultStrings as LocaleStrings;
         };
     };
