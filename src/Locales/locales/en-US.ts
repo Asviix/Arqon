@@ -10,11 +10,20 @@ export const en = {
     ERROR_GENERIC: `An unexpected error occurred. Please try again.`,
 
     // PING
+    // HELP
+    COMMAND_PING_HELP_EMBED_TITLE: `ping`,
+    COMMAND_PING_HELP_EMBED_FIELD1_NAME: `Description:`,
+    COMMAND_PING_HELP_EMBED_FIELD1_VALUE: `Gets multiple runtime statistics:\n- The bot's latency\n- The bot's Uptime\n- The Discord API Latency.`,
+    COMMAND_PING_HELP_EMBED_FIELD2_NAME: `Usage:`,
+    COMMAND_PING_HELP_EMBED_FIELD2_VALUE: `\`/help <command>\`\n\n- Replace <command> with the command you help for.`,
+    // COMMAND
+    COMMAND_PING_ERROR_COMMAND_NO_EXIST: `❌ This command doesn't exist!`,
     COMMAND_PING_EMBED_TITLE: `🏓 Ping!`,
     COMMAND_PING_EMBED_FIELD_TITLE: `**Statistics:**`,
     COMMAND_PING_EMBED_FIELD_DESCRIPTION: ({ wsping, apiLatency, uptime }: i.a_COMMAND_PING_EMBED_FIELD_DESCRIPTION) =>
         `**- Websocket Ping:** \`${wsping}ms\`\n**- API Latency:** \`${apiLatency}ms\`\n**- Uptime:** \`${uptime}\``,
 
+    //HLTV
     //HLTV MANAGER
     COMMAND_HLTV_MANAGER_ERROR1_TITLE: `Command Error`,
     COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION: ({ method }: i.a_COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION) =>

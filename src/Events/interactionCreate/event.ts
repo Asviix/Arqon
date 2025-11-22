@@ -23,8 +23,9 @@ export default class InteractionCreateEvent extends EventHandler {
 
         if (interaction.isAutocomplete()) {
             const focusedOption = interaction.options.getFocused(true);
+            const commandName = interaction.commandName;
 
-            if (focusedOption.name === 'maps') {
+            if (focusedOption.name === 'maps' && commandName === 'hltv') {
                 const fullInput = focusedOption.value;
 
                 const parts = fullInput.split(',');
@@ -37,7 +38,20 @@ export default class InteractionCreateEvent extends EventHandler {
                 await interaction.respond(
                     filtered.map(map => ({ name: map, value: map}))
                 );
-            };
+            } else if (focusedOption.name === 'command' && commandName === 'help') {
+                const fullInput = focusedOption.value;
+
+                const currentSearch = fullInput.trim().toLowerCase();
+
+                const filtered = client.commands
+                    .filter(command => command.name.toLowerCase().includes(currentSearch))
+                    .map(command => ({ name: command.name, value: command.name}))
+                    .slice(0, 25);
+
+                await interaction.respond(
+                    filtered
+                );
+            }
         };
 
         if (!interaction.isChatInputCommand()) return;
