@@ -16,6 +16,7 @@ export default class HelpCommand extends Command {
             .setName('command')
             .setDescription('The command you want help for.')
             .setRequired(true)
+            .setAutocomplete(true)
         ) as SlashCommandBuilder;
 
     public async execute (c: CommandContext) {
