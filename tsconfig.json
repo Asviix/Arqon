@@ -14,7 +14,8 @@
         "strict": true,
         "skipLibCheck": true,
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@help/*": ["./src/Commands/Utility/help/*"]
         }
     },
     "include": [
@@ -22,6 +23,8 @@
     ],
     "exclude": [
         "node_modules",
-        "phpmyadmin"
+        "phpmyadmin",
+        "pma_themes",
+        ".vscode"
     ]
 }

@@ -2,8 +2,7 @@
 
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
 import { Command, CommandContext } from "@/Commands/BaseCommand";
-import { HelpHandler } from "./services/helpHandler";
-import { Logger } from "@/Utils/Logger";
+import { HelpHandler } from "@help/services/handler";
 
 export default class HelpCommand extends Command {
     public cooldown: number = 5;
@@ -20,16 +19,9 @@ export default class HelpCommand extends Command {
         ) as SlashCommandBuilder;
 
     public async execute (c: CommandContext) {
-        const startTime = Date.now()
-
         const h = new HelpHandler(c);
         const msgPayload = await h.main();
-
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-
-        Logger.debug(`[EXECUTION TIME] /${this.commandData.name} took ${duration}ms.`)
-
-        c.interaction.reply(msgPayload);
+        await c.interaction.reply(msgPayload);
+        h.dispose();
     };
 };
