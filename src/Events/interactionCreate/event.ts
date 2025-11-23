@@ -71,7 +71,7 @@ export default class InteractionCreateEvent extends EventHandler {
             return;
         };
 
-        h.dispose();
+        process.nextTick(() => h.dispose());
     };    
 
     private async interractionErrorReply(payload: InteractionReplyOptions, i: ChatInputCommandInteraction): Promise<void> {

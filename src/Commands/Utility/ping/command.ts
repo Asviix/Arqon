@@ -2,7 +2,7 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 import { Command, CommandContext } from '@/commands/baseCommand'
-import { createPingEmbed } from './services/embedsGenerator';
+import { PingHandler } from './services/handler';
 
 export default class PingCommand extends Command {
     public cooldown: number = 5;
@@ -17,34 +17,10 @@ export default class PingCommand extends Command {
 
         const pinging = await c.interaction.deferReply() // Defer reply
 
-        const ws = c.interaction.client.ws.ping; // Websocket Ping
-        const apiLatency = pinging.createdTimestamp - Date.now(); // API Latency
+        const h = new PingHandler(c, pinging);
+        const payload = h.main();
 
-        // Uptime
-        let daysTemp = Math.floor(c.interaction.client.uptime / 86400000);
-        let hoursTemp = Math.floor(c.interaction.client.uptime / 3600000) % 24;
-        let minutesTemp = Math.floor(c.interaction.client.uptime / 60000) % 60;
-        let secondsTemp = Math.floor(c.interaction.client.uptime / 1000) % 60;
-
-        let days = daysTemp === 0 ? '' : daysTemp + 'd, ';
-        let hours = hoursTemp === 0 ? '': hoursTemp + 'h, ';
-        let minutes = minutesTemp === 0 ? '': minutesTemp + 'm, ';
-        let seconds = secondsTemp === 0 ? '': secondsTemp + 's';
-
-        let uptime = days + hours + minutes + seconds;
-
-        if (uptime.endsWith(', ')) {
-            uptime = uptime.slice(0, -2);
-        };
-
-        if (uptime === '') {
-            uptime = 'Less than 1 second.'
-        };
-
-        const returnEmbed = createPingEmbed(c, {ws, apiLatency, uptime})
-
-        await pinging.edit({
-            embeds: [returnEmbed]
-        });
+        pinging.edit(payload);
+        process.nextTick(() => h.dispose());
     };
 };

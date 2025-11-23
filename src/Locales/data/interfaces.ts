@@ -4,7 +4,7 @@ import { LocalizationKeys } from "./keys";
 
 export interface ParametrizedKeyMap {
     'COOLDOWN': a_COOLDOWN;
-    'COMMAND_PING_EMBED_FIELD_DESCRIPTION': a_COMMAND_PING_EMBED_FIELD_DESCRIPTION,
+    'COMMAND_PING_EMBED_FIELD_VALUE': a_COMMAND_PING_EMBED_FIELD_VALUE,
     'COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION': a_COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION,
     'COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION': a_COMMAND_HLTV_LIVE_MATCHES_EMBED_DESCRIPTION,
     'COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME': a_COMMAND_HLTV_LIVE_MATCHES_EMBED_FIELDS_NAME,
@@ -18,10 +18,12 @@ export interface a_COOLDOWN {
     commandName: string
 };
 
-export interface a_COMMAND_PING_EMBED_FIELD_DESCRIPTION {
+export interface a_COMMAND_PING_EMBED_FIELD_VALUE {
     wsping: string,
     apiLatency: string,
-    uptime: string
+    uptime: string,
+    memoryUsage: string,
+    users: string
 };
 
 export interface a_COMMAND_HLTV_MANAGER_ERROR1_DESCRIPTION {

@@ -2,8 +2,8 @@
 
 import { ChatInputCommandInteraction, Collection, Interaction, InteractionReplyOptions } from "discord.js";
 import { BotClient } from "@/client/botClient";
-import { Command, CommandContext } from "@/commands/baseCommand";
 import { BoundTranslatorObject, createTranslator } from "@/utils/translatorHelper";
+import { Command, CommandContext } from "@/commands/baseCommand";
 import { DEFAULT_LOCALE } from "@/managers/localizationManager";
 import { Logger } from "@/utils/logger";
 

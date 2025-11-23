@@ -19,9 +19,13 @@ export const en = {
     // COMMAND
     COMMAND_PING_ERROR_COMMAND_NO_EXIST: `❌ This command doesn't exist!`,
     COMMAND_PING_EMBED_TITLE: `🏓 Ping!`,
-    COMMAND_PING_EMBED_FIELD_TITLE: `**Statistics:**`,
-    COMMAND_PING_EMBED_FIELD_DESCRIPTION: ({ wsping, apiLatency, uptime }: i.a_COMMAND_PING_EMBED_FIELD_DESCRIPTION) =>
-        `**- Websocket Ping:** \`${wsping}ms\`\n**- API Latency:** \`${apiLatency}ms\`\n**- Uptime:** \`${uptime}\``,
+    COMMAND_PING_EMBED_FIELD_NAME: `**Statistics:**`,
+    COMMAND_PING_EMBED_FIELD_VALUE: ({ wsping, apiLatency, uptime, memoryUsage, users }: i.a_COMMAND_PING_EMBED_FIELD_VALUE) =>
+    `**- Websocket Ping:** \`${wsping}ms\`
+    **- API Latency:** \`${apiLatency}ms\`
+    **- Memory Usage:** \`${memoryUsage}MB\`
+    **- Total Users:** \`${users}\`
+    **- Uptime:** \`${uptime}\``,
 
     //HLTV
     //HLTV MANAGER
