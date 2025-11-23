@@ -2,14 +2,7 @@
 
 import { EmbedBuilder, InteractionResponse, MessageEditOptions } from "discord.js";
 import { CommandContext } from "@/commands/baseCommand";
-
-interface PingData {
-    ws: string,
-    api: string,
-    uptime: string,
-    memory: string,
-    users: string
-};
+import { PingData } from "../interfaces";
 
 export class PingHandler {
     private c: CommandContext;
@@ -31,7 +24,7 @@ export class PingHandler {
 
     private getStats(): PingData {
         const ws = this.c.interaction.client.ws.ping.toString();
-        const api = (this.p.createdTimestamp - Date.now()).toString();
+        const api = (Date.now() - this.p.createdTimestamp).toString();
 
         // Uptime
         let daysTemp = Math.floor(this.c.interaction.client.uptime / 86400000);

@@ -31,10 +31,6 @@ Identify the primary beneficiaries of this feature.
 
 - [ ] Developers (Those who maintain or extend the codebase)
 
-- [ ] Project Managers / Product Owners
-
-- [ ] Other Stakeholders: [Specify here]
-
 ### Who (References to who creates the feat)
 
 If known, specify the individual or team responsible for implementing this.
@@ -69,6 +65,8 @@ Please mark the appropriate status:
 ### Status and Update Log
 
 Use this section to log progress, major decisions, or timeline changes.
+
+Examples:
 
 [YYYY-MM-DD]: [Initial triage/decision summary]
 

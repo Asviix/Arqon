@@ -16,6 +16,7 @@ import {
 
 import { BotClient } from "@/client/botClient";
 import { Logger } from "@/utils/logger";
+import { startTime } from "@/index";
 
 export class ReadyHandler {
     private c: BotClient;
@@ -38,6 +39,7 @@ export class ReadyHandler {
         if (this.c.user instanceof ClientUser && this.c.application instanceof ClientApplication) {
             Logger.success(`Bot is online! Logged in as ${this.c.user.tag}`);
             Logger.info(`Bot Client ID: ${this.c.application.id}`);
+            Logger.info(`Startup time: ${Date.now() - startTime}ms`)
         } else {
             Logger.warn(`Completed ready services, but client user or application object is missing.`)
         };

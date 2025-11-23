@@ -1,5 +1,7 @@
 // src\index.ts
 
+export const startTime = Date.now();
+
 import 'dotenv/config'; // Load Environment Variables from .env file
 import { GatewayIntentBits } from 'discord.js';
 import * as path from 'path';
@@ -7,6 +9,8 @@ import { BotClient } from '@/client/botClient';
 import { CommandHandler } from '@/handlers/commandHandler';
 import { EventLoadHandler } from '@/handlers/eventHandler';
 import { Logger } from '@/utils/logger';
+
+Logger.info(`\n\n==================\nNEW INSTANCE\n==================\n\n`)
 
 export const COMMANDS_BASE_DIR: string = path.join(__dirname, 'Commands');
 
