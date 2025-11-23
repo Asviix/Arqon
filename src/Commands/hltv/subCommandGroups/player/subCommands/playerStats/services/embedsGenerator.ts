@@ -2,7 +2,7 @@
 
 import * as i from "./interfaces";
 import { EmbedBuilder } from "discord.js";
-import { CommandContext } from "@/Commands/BaseCommand";
+import { CommandContext } from "@/commands/baseCommand";
 
 export function createStatsEmbed(c: CommandContext, stats: i.Stats): EmbedBuilder {
     const _ = c._;

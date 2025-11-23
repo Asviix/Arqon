@@ -2,7 +2,7 @@
 
 import { InteractionReplyOptions } from 'discord.js';
 import * as cheerio from 'cheerio';
-import { CommandContext } from '@/Commands/BaseCommand';
+import { CommandContext } from '@/commands/baseCommand';
 import { createMatchEmbed } from './services/embedsGenerator';
 import { liveMatchesHTMLData as htmlData } from './data/htmlScrapeData';
 

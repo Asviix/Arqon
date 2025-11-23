@@ -1,7 +1,7 @@
 // src\Commands\Utility\help\command.ts
 
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
-import { Command, CommandContext } from "@/Commands/BaseCommand";
+import { Command, CommandContext } from "@/commands/baseCommand";
 import { HelpHandler } from "./services/handler";
 
 export default class HelpCommand extends Command {

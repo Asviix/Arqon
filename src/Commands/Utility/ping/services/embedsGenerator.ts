@@ -1,7 +1,7 @@
 // src\Commands\ping\pingCommand\services\embedsGenerator.ts
 
 import { EmbedBuilder } from "discord.js";
-import { CommandContext } from "@/Commands/BaseCommand";
+import { CommandContext } from "@/commands/baseCommand";
 
 interface PingData {
     ws: number,

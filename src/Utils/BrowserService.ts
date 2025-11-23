@@ -3,7 +3,7 @@
 import { Browser, Page } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import { Logger } from "@/Utils/Logger";
+import { Logger } from "@/utils/logger";
 
 puppeteer.use(StealthPlugin());
 

@@ -1,8 +1,8 @@
 // src\Database\MySQLClient.ts
 
 import * as mysql from 'mysql2/promise';
-import { BotClient } from '@/Client/BotClient';
-import { Logger } from '@/Utils/Logger';
+import { BotClient } from '@/client/botClient';
+import { Logger } from '@/utils/logger';
 
 /**
  * Sets a delay to sleep the function.

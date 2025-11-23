@@ -6,7 +6,7 @@
     "dev": "ts-node -r tsconfig-paths/register src/index.ts",
     "dev:prod": "ts-node -r tsconfig-paths/register src/index.ts --env=production",
     "start": "node dist/index.js --env=production",
-    "build": "tsc --project tsconfig.json && cp -R src/Locales dist/ && tsc-alias"
+    "build": "tsc --project tsconfig.json && cp -R src/locales dist/ && tsc-alias"
   },
   "keywords": [],
   "author": "",

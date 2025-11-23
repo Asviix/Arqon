@@ -1,7 +1,7 @@
 // src\Events\clientReady\event.ts
 
-import { BotClient } from '@/Client/BotClient';
-import { EventHandler } from '@/Events/BaseEvent';
+import { BotClient } from '@/client/botClient';
+import { EventHandler } from '@/events/baseEvent';
 import { ReadyHandler } from './services/handler';
 
 export default class ReadyEvent extends EventHandler {
@@ -13,6 +13,7 @@ export default class ReadyEvent extends EventHandler {
 
         const h = new ReadyHandler(client);
         await h.main();
+        h.dispose();
 
         setInterval(() => {
             client.db.syncSessionCounters();

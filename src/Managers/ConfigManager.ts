@@ -1,9 +1,9 @@
 // src\Managers\ConfigManager.ts
 
 import * as mysql from 'mysql2/promise'
-import { BotClient } from "@/Client/BotClient";
-import { GuildConfig, MySQLClient } from '@/Database/MySQLClient';
-import { Logger } from "@/Utils/Logger";
+import { BotClient } from "@/client/botClient";
+import { GuildConfig, MySQLClient } from '@/database/mySQLClient';
+import { Logger } from "@/utils/logger";
 
 /**
  * Manages the retrieval of guild-specific configurations,

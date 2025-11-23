@@ -1,7 +1,7 @@
 // src\Commands\Utility\help\services\helpHandler.ts
 
 import { EmbedBuilder, InteractionReplyOptions, MessageFlags } from "discord.js";
-import { Command, CommandContext } from "@/Commands/BaseCommand";
+import { Command, CommandContext } from "@/commands/baseCommand";
 import { LocaleStrings } from "../types";
 import { LocaleStringsEnum as lsm , HelpKeysEnum as hku} from "../enums";
 

@@ -1,8 +1,8 @@
 // src\Commands\reloadCommand\command.ts
 
 import { InteractionContextType, InteractionReplyOptions, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { Command, CommandContext } from "@/Commands/BaseCommand";
-import { isOwner } from "@/Utils/Permissions";
+import { Command, CommandContext } from "@/commands/baseCommand";
+import { isOwner } from "@/utils/permissions";
 import { runMethod } from './subCommands/manager';
 
 export default class ReloadCommand extends Command {

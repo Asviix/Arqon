@@ -1,10 +1,10 @@
 //src/Commands/hltv/manager.ts
 
 import { EmbedBuilder, InteractionReplyOptions } from "discord.js";
-import { CommandContext } from '@/Commands/BaseCommand';
+import { CommandContext } from '@/commands/baseCommand';
 import { getLiveMatches } from "./subCommands/live/subCommand";
 import { getPlayerStats } from "./subCommandGroups/player/subCommands/playerStats/subCommand";
-import { Logger } from "@/Utils/Logger";
+import { Logger } from "@/utils/logger";
 
 type HLTVMethod = (...args: any[]) => Promise<InteractionReplyOptions>;
 

@@ -1,8 +1,8 @@
 //src/Commands/Owner/reload/subCommands/command/methods.ts
 
-import { CommandContext } from '@/Commands/BaseCommand';
+import { CommandContext } from '@/commands/baseCommand';
 import { getCommandFilePath, reloadModule } from './services/reloadModule';
-import { Logger } from '@/Utils/Logger';
+import { Logger } from '@/utils/logger';
 
 export function reloadCommandMainEntry(c: CommandContext, commandName: string, commandCategory: string | null): Promise<boolean> {
     try {

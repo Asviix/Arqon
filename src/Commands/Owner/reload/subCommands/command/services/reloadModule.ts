@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import { COMMANDS_BASE_DIR as commandsDir } from '@/index';
-import { Logger } from '@/Utils/Logger';
+import { Logger } from '@/utils/logger';
 
 export function getCommandFilePath(inputName: string, category: string | null): string {
 

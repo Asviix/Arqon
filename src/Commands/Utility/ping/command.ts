@@ -1,7 +1,7 @@
 // src\Commands\Utility\ping\command.ts
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
-import { Command, CommandContext } from '@/Commands/BaseCommand'
+import { Command, CommandContext } from '@/commands/baseCommand'
 import { createPingEmbed } from './services/embedsGenerator';
 
 export default class PingCommand extends Command {

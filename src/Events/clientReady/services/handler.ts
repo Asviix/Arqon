@@ -11,11 +11,11 @@ import {
     GuildBasedChannel,
     Message,
     MessagePin,
-    TextChannel 
+    TextChannel
 } from "discord.js";
 
-import { BotClient } from "@/Client/BotClient";
-import { Logger } from "@/Utils/Logger";
+import { BotClient } from "@/client/botClient";
+import { Logger } from "@/utils/logger";
 
 export class ReadyHandler {
     private c: BotClient;
@@ -40,7 +40,7 @@ export class ReadyHandler {
             Logger.info(`Bot Client ID: ${this.c.application.id}`);
         } else {
             Logger.warn(`Completed ready services, but client user or application object is missing.`)
-        }
+        };
     };
 
     private async _registerCommands(): Promise<void> {
@@ -184,7 +184,11 @@ export class ReadyHandler {
                 Logger.error(`Unable to edit the pinned message.`, e);
             };
         } else {
-            Logger.warn(`Pinned item was found but not resolvable as a Message.`)
+            Logger.warn(`Pinned item was found but is not resolvable as a Message.`)
         };
+    };
+
+    public dispose(): void {
+        (this.c as any) = null;
     };
 };

@@ -1,8 +1,8 @@
 // src\Commands\Owner\reload\subCommands\manager.ts
 
 import { InteractionReplyOptions, MessageFlags } from "discord.js";
-import { CommandContext } from "@/Commands/BaseCommand";
-import { Logger } from "@/Utils/Logger";
+import { CommandContext } from "@/commands/baseCommand";
+import { Logger } from "@/utils/logger";
 import { reloadCommand } from "./command/subCommand";
 
 type ReloadMethod = (...args: any[]) => Promise<InteractionReplyOptions>;

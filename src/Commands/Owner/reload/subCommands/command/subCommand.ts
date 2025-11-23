@@ -1,7 +1,7 @@
 // src\Commands\Owner\reload\subCommands\command\subCommand.ts
 
 import { InteractionReplyOptions, MessageFlags } from "discord.js";
-import { CommandContext } from "@/Commands/BaseCommand";
+import { CommandContext } from "@/commands/baseCommand";
 import { reloadCommandMainEntry } from "./methods";
 
 export async function reloadCommand(c: CommandContext, commandName: string, commandCategory: string | null): Promise<InteractionReplyOptions> {

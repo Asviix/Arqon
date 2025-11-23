@@ -3,9 +3,9 @@
 import { AttachmentBuilder, EmbedBuilder, InteractionReplyOptions } from 'discord.js';
 import sharp from 'sharp';
 import * as cheerio from 'cheerio';
-import { CommandContext } from '@/Commands/BaseCommand';
+import { CommandContext } from '@/commands/baseCommand';
 import { createStatsEmbed } from './services/embedsGenerator';
-import { HLTV_PLAYER_IDS as playerIds } from '@/Config/hltvPlayerDatabase';
+import { HLTV_PLAYER_IDS as playerIds } from '@/config/hltvPlayerDatabase';
 import { HTTPResponse } from 'puppeteer';
 import { playerStatsHTMLData as htmlData } from './data/htmlScrapeData';
 

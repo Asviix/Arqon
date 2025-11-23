@@ -2,13 +2,13 @@
 
 import { Client, Collection, ClientOptions, ColorResolvable } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
-import { BrowserService } from '@/Utils/BrowserService';
-import { EventHandler } from '@/Events/BaseEvent';
-import { ConfigManager } from '@/Managers/ConfigManager';
-import { Command } from '@/Commands/BaseCommand';
-import { LocaleStrings, LocalizationManager } from '@/Managers/LocalizationManager';
-import { Logger } from '@/Utils/Logger';
-import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
+import { BrowserService } from '@/utils/browserService';
+import { EventHandler } from '@/events/baseEvent';
+import { ConfigManager } from '@/managers/configManager';
+import { Command } from '@/commands/baseCommand';
+import { LocaleStrings, LocalizationManager } from '@/managers/localizationManager';
+import { Logger } from '@/utils/logger';
+import { MySQLClient, GuildConfig } from '@/database/mySQLClient';
 
 /**
  * The BotClient class that extends client.
