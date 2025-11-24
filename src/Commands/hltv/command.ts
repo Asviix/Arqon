@@ -68,9 +68,14 @@ export default class HLTVCommand extends Command {
         };
 
         const subCommandGroup = c.interaction.options.getSubcommandGroup();
+        const subCommand = c.interaction.options.getSubcommand();
+
+        if (subCommand === 'live') {
+            await c.interaction.deferReply();
+            returnPayload = await runMethod(c, subCommand);
+        };
 
         if (subCommandGroup) {
-            const subCommand = c.interaction.options.getSubcommand();
             if (subCommandGroup === 'player') {
                 if (subCommand === 'stats') {
                     const playerName = c.interaction.options.getString('name');
@@ -90,11 +95,6 @@ export default class HLTVCommand extends Command {
                 }
             }
 
-        } else {
-            const subCommand = c.interaction.options.getSubcommand();
-            if (subCommand === 'live') {
-                returnPayload = await runMethod(c, subCommand);
-            };
         };
 
         await c.interaction.followUp(returnPayload);

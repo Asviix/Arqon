@@ -13,7 +13,7 @@ const methodRegistry: Record<string, HLTVMethod> = {
     'stats': getPlayerStats
 };
 
-export function runMethod(c: CommandContext, method: string, ...args: any[]): Promise<InteractionReplyOptions> {
+export async function runMethod(c: CommandContext, method: string, ...args: any[]): Promise<InteractionReplyOptions> {
     const _ = c._;
     const methodFunction = methodRegistry[method];
 
@@ -26,9 +26,9 @@ export function runMethod(c: CommandContext, method: string, ...args: any[]): Pr
             .setColor(c.client.embedOrangeColor);
         const returnPayload: InteractionReplyOptions = {
             embeds: [noMethodFunctionEmbed]
-        }
+        };
 
-        return Promise.resolve(returnPayload);
+        return returnPayload;
     };
 
     try {
