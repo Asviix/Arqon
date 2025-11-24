@@ -1,10 +1,9 @@
 // src\commands\owner\shutdown\services\handler.ts
 
-import { InteractionReplyOptions, InteractionResponse, MessageFlags } from "discord.js";
-import { spawn } from "child_process";
 import { CommandContext } from "@/commands/baseCommand";
-import { isOwner } from "@/utils/permissions";
 import { Logger } from "@/utils/logger";
+import { isOwner } from "@/utils/permissions";
+import { InteractionReplyOptions, MessageFlags } from "discord.js";
 
 export class ShutdownHandler {
     private c: CommandContext;

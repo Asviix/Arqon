@@ -2,7 +2,7 @@
 
 import { EmbedBuilder, InteractionResponse, MessageEditOptions } from "discord.js";
 import { CommandContext } from "@/commands/baseCommand";
-import { PingData } from "../interfaces";
+import { PingData } from "./interfaces";
 
 export class PingHandler {
     private c: CommandContext;
