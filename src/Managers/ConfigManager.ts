@@ -1,14 +1,10 @@
 // src\Managers\ConfigManager.ts
 
-import * as mysql from 'mysql2/promise'
 import { BotClient } from "@/client/botClient";
-import { GuildConfig, MySQLClient } from '@/database/mySQLClient';
+import { GuildConfig, HltvPlayer, MySQLClient } from '@/database/mySQLClient';
 import { Logger } from "@/utils/logger";
+import * as mysql from 'mysql2/promise';
 
-/**
- * Manages the retrieval of guild-specific configurations,
- * including language codes and localized strings.
- */
 export class ConfigManager {
     private static instance: ConfigManager;
     private client: BotClient;
@@ -27,11 +23,6 @@ export class ConfigManager {
         return ConfigManager.instance;
     };
 
-    /**
-     * Initializes the database for a newly joined guild.
-     * @param guildId The ID of the guild to add.
-     * @returns A GuildConfig object.
-     */
     public async initializeGuildConfig(guildId: string): Promise<GuildConfig> {
         await this.db.query(
             `INSERT INTO guild_configs (guild_id) VALUES (?)`, [guildId]
@@ -46,11 +37,6 @@ export class ConfigManager {
         return newConfig;
     };
 
-    /**
-     * Gets a guild config and initializes it if not present.
-     * @param guildId The ID of the guild to get.
-     * @returns A GuildConfig object.
-     */
     public async getGuildConfig(guildId: string): Promise<GuildConfig> {
         const rows = await this.db.query<mysql.RowDataPacket[]>(
             `SELECT * FROM guild_configs WHERE guild_id = ?`,
@@ -75,11 +61,6 @@ export class ConfigManager {
         };
     };
 
-    /**
-     * Gets the cached config of a specific guild and creates it if not there yet.
-     * @param guildId The ID of the Guild.
-     * @returns A GuildConfig object.
-     */
     public async getCachedGuildConfig(guildId: string): Promise<GuildConfig> {
         const cachedConfig = this.client.guildConfigs.get(guildId);
 
@@ -90,5 +71,54 @@ export class ConfigManager {
         };
 
         return cachedConfig;
+    };
+
+    public async insertPlayerinHLTVDatabase(data: HltvPlayer): Promise<void> {
+        await this.db.query(
+            `INSERT INTO hltv_players_database (player_id, first_name, last_name, nickname, country) VALUES (?, ?, ?, ?, ?)`,
+            [data.player_id, data.first_name, data.last_name, data.nickname, data.country]
+        );
+    };
+
+    public async getHLTVPlayer(playerNick: string): Promise<HltvPlayer[] | null> {
+        const rows = await this.db.query<mysql.RowDataPacket[]>(
+            `SELECT * FROM hltv_players_database WHERE nickname = ?`,
+            [playerNick]
+        );
+
+        if (rows && rows.length > 0) {
+            return rows as HltvPlayer[];
+        };
+
+        for (const player of rows as HltvPlayer[]) {
+            this.insertCachedHLTVPlayer(player);
+        };
+
+        return null;
+    };
+
+    private insertCachedHLTVPlayer(data: HltvPlayer): void {
+        const { player_id, nickname } = data;
+
+        this.client.hltvPlayerDBbyID.set(player_id, data);
+
+        const exist = this.client.hltvPlayerDBbyNick.get(nickname.toLowerCase());
+        if (exist) {
+            exist.push(player_id);
+        } else {
+            this.client.hltvPlayerDBbyNick.set(nickname.toLowerCase(), [player_id]);
+        };
+    };
+
+    public getCachedHLTVPlayer(playerNick: string): HltvPlayer[] | null {
+        const ids = this.client.hltvPlayerDBbyNick.get(playerNick.toLowerCase());
+
+        if (!ids) return null;
+
+        const players = ids
+            .map(id => this.client.hltvPlayerDBbyID.get(id))
+            .filter((p): p is HltvPlayer => p !== undefined);
+
+        return players.length > 0 ? players : null;
     };
 };

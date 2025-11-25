@@ -29,7 +29,7 @@ export class ShutdownHandler {
         const bool = this.c.interaction.options.getBoolean('auto_restart');
 
         payload = {
-            content: bool ?  'Restarting...': 'Shutting down...',
+            content: bool ?  'Shutting down... (sent restart code to PM2)' : 'Shutting down...',
             flags: MessageFlags.Ephemeral
         };
 
@@ -43,7 +43,7 @@ export class ShutdownHandler {
     };
 
     private async restartApp(): Promise<void> {
-        Logger.info(`Restarting application with PM2... Ordered by ${this.c.interaction.user.displayName} (${this.c.interaction.user.id}) in ${this.c.interaction.guild!.name} (${this.c.interaction.guildId}) on ${new Date().toLocaleString('en-GB')}`);
+        Logger.info(`Shutting Down... (sent restart code to PM2) Ordered by ${this.c.interaction.user.displayName} (${this.c.interaction.user.id}) in ${this.c.interaction.guild!.name} (${this.c.interaction.guildId}) on ${new Date().toLocaleString('en-GB')}`);
 
         await this.c.client.db.syncSessionCounters();
         this.c.client.destroy();

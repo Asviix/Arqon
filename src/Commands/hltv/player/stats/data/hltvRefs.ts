@@ -10,5 +10,11 @@ export const hltvRefs = {
         'div.role-stats-section-arrow'
     ],
 
-    NAME_WRAPPER: 'div.player-summary-stat-box-left-text-wrapper'
+    NAME_WRAPPER: 'div.player-summary-stat-box-left-text-wrapper',
+
+    topStatsContainer: 'div.player-summary-stat-box',
+    roleStatsContainer: 'div.role-stats-container.standard-box',
+    summaryStats: 'div.stats-section.stats-player.stats-player-overview',
+    playerBodyShot: 'img.player-summary-stat-box-left-bodyshot',
+    mapCount: 'div.player-summary-stat-box-right-map-count'
 };

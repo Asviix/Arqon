@@ -55,7 +55,7 @@ export class Logger {
 
         const output = `${Colors.Dim}[${timestamp}]${Colors.Reset} ${color}${Colors.Bright}[${tag}]${Colors.Reset} ${message}`;
 
-        console.log(args.length > 0 ? '\n' + output + '\n\n': output, ...args.join('\n'));
+        console.log(args.length > 0 ? '\n' + output + '\n' + args.join('\n') : output);
     };
 
     /**

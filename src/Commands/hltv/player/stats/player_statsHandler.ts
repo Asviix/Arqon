@@ -1,39 +1,110 @@
 // src\commands\hltv\player\stats\player_statsHandler.ts
 
 import { CommandContext } from "@/commands/baseCommand";
-import { InteractionReplyOptions, MessageFlags } from "discord.js";
-import { HTTPResponse, Page } from "puppeteer";
-import { HLTV_PLAYER_IDS as playerIds } from "@/config/hltvPlayerDatabase";
+import { HltvPlayer } from "@/database/mySQLClient";
+import * as cheerio from "cheerio";
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, InteractionEditReplyOptions, InteractionReplyOptions } from "discord.js";
+import { ElementHandle, HTTPResponse, Page } from "puppeteer";
+import sharp from "sharp";
 import { hltvRefs } from "./data/hltvRefs";
+import { statsData } from "./data/interfaces";
 
 export class player_statsHandler {
     private c: CommandContext
+    private ephemeral: boolean
+    private playerName: string;
+    private gameVersion: string | null;
+    private start_date: string | null;
+    private end_date: string | null;
 
     constructor(c: CommandContext) {
         this.c = c;
+        this.ephemeral = this.c.interaction.options.getBoolean('ephemeral', true);
+        this.playerName = this.c.interaction.options.getString('name', true);
+        this.gameVersion = this.c.interaction.options.getString('game_version');
+        this.start_date = this.c.interaction.options.getString('start_date');
+        this.end_date = this.c.interaction.options.getString('end_date');
     };
 
-    public async main(): Promise<InteractionReplyOptions> {
-        //do stuff
-    };
+    public async main(): Promise<InteractionEditReplyOptions> {
+        let payload: InteractionEditReplyOptions;
 
-    private async getStats(): Promise<InteractionReplyOptions> {
-        let payload: InteractionReplyOptions;
+        if (this.start_date && this.end_date) {
+            let isDateValid = this.validateDate();
+            if (isDateValid) {
+                return payload = isDateValid as InteractionEditReplyOptions;
+            };
+        };
 
         const page = await this.c.client.browserService.getNewPage();
 
         this.denyCookies(page);
 
-        const httpReponse: HTTPResponse | null = await page.goto(this.getStatsUrl(this.c.interaction.options.getString('name', true)));
+        const statsUrl = await this.getStatsUrl(page);
+
+        if (!(typeof statsUrl === 'string')) {
+            return payload = statsUrl as InteractionEditReplyOptions;
+        };
+
+        const httpReponse: HTTPResponse | null = await page.goto(statsUrl, {
+            waitUntil: 'networkidle2',
+            referer: 'https://hltv.org',
+            timeout: 10000
+        });
         const blockage = this.isBlocked(httpReponse);
 
         if (blockage) {
-            return payload = blockage as InteractionReplyOptions;
+            return payload = blockage as InteractionEditReplyOptions;
         };
 
         this.adjustCSS(page);
 
-        
+        const [stats, attachement] = await this.scrapeHTML(page, statsUrl);
+
+        await page.close();
+
+        const embed = this.createEmbed(stats);
+
+        payload = {
+            content: '',
+            embeds: [embed],
+            files: [attachement]
+        };
+
+        return payload;
+    };
+
+    private validateDate(): InteractionReplyOptions | boolean {
+        let payload: InteractionReplyOptions;
+
+        function isValidDateString(dateStr: string): boolean {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                return false;
+            };
+
+            const date = new Date(dateStr);
+
+            if (isNaN(date.getTime())) {
+                return false;
+            };
+
+            const [year, month, day] = dateStr.split('-').map(Number);
+
+            return date.getFullYear() === year
+                && date.getMonth() === month - 1
+                && date.getDate() === day;
+        };
+
+        if (this.start_date && this.end_date) {
+            if (!isValidDateString(this.start_date) || !isValidDateString(this.end_date)) {
+                payload = {
+                    content: 'Invalid date format or value. Please use YYYY-MM-DD.',
+                };
+                return payload;
+            };
+        };
+
+        return false;
     };
 
     private denyCookies(p: Page) {
@@ -49,19 +120,224 @@ export class player_statsHandler {
         });
     };
 
-    private getStatsUrl(name: string): string {
-        const ids: Record<string, number> = playerIds;
-        let statsUrl: string = '';
-        let playerId: string;
+    private async getStatsUrl(p: Page): Promise<string | InteractionReplyOptions> {
+        const players = await this.getPlayers(p, this.playerName);
 
-        if (Object.prototype.hasOwnProperty.call(ids, name.toLowerCase())) {
-            playerId = ids[name.toLowerCase()].toString();
-            statsUrl = hltvRefs.STATS_URL
-                .replace('[id]', playerId)
-                .replace('[player]', name);
+        if (!players) {
+            return {
+                content: 'Your search returned no result.',
+            };
+        };
+
+        let playerId;
+        let playerName;
+
+        if (players.length === 1) {
+            playerId = players[0].player_id;
+            playerName = players[0].nickname;
+        } else {
+            const userResponse = await this.handleComponents(players);
+            if (typeof userResponse !== 'number') {
+                return userResponse;
+            };
+
+            playerId = players[userResponse].player_id;
+            playerName = players[userResponse].nickname;
+        };
+
+        const sanitizedNickname = playerName.replace(/\s+/g, '-');
+
+        let statsUrl: string = hltvRefs.STATS_URL
+            .replace('[id]', playerId.toString())
+            .replace('[player]', sanitizedNickname);
+
+        let queryParams: string[] = [];
+
+        if (this.gameVersion) {
+            queryParams.push(`csVersion=${this.gameVersion}`);
+        };
+
+        if (this.start_date && this.end_date) {
+            queryParams.push(`startDate=${this.start_date}&endDate=${this.end_date}`)
+        };
+
+        if (queryParams.length > 0) {
+            statsUrl = `${statsUrl}?${queryParams.join('&')}`;
         };
 
         return statsUrl;
+    };
+
+    private async getPlayers(p: Page, query: string): Promise<HltvPlayer[] | void> {
+        const cachedPlayer = this.c.client.configManager.getCachedHLTVPlayer(query);
+        if (cachedPlayer) {
+            return cachedPlayer
+        };
+
+        const dbPlayers = await this.c.client.configManager.getHLTVPlayer(query);
+        if (dbPlayers) {
+            return dbPlayers
+        };
+
+        const players = await this.fetchPlayersFromHLTV(p, query)
+
+        return players;
+    };
+
+    private async fetchPlayersFromHLTV(p: Page, query: string): Promise<HltvPlayer[]> {
+        await p.goto(`https://www.hltv.org/search?query=${query.toLowerCase()}`, {
+            waitUntil: 'domcontentloaded',
+            referer: 'https://www.hltv.org',
+            timeout: 10000
+        });
+
+        const html = await p.content();
+        const $ = cheerio.load(html);
+        const searchField = $('div.search');
+
+        const tables = searchField.find('table.table');
+        const players: HltvPlayer[] = [];
+
+        tables.each((tableIndex, tableElement) => {
+            const $table = $(tableElement);
+            const headers = $table.find('td.table-header');
+
+            let hasPlayerHeader = false;
+            headers.each((i, header) => {
+                const text = $(header).text().trim();
+                if (text.toLowerCase() === 'player') {
+                    hasPlayerHeader = true;
+                }
+            });
+
+            if (!hasPlayerHeader) return;
+
+            const rows = $table.find('tr').slice(1);
+
+            rows.each((rowIndex, rowElement) => {
+                const $row = $(rowElement);
+                const $cell = $row.find('td').first();
+                const $link = $cell.find('a');
+
+                if ($link.length === 0) return;
+
+                const href = $link.attr('href') || '';
+                const idMatch = href.match(/\/player\/(\d+)\//);
+                if (!idMatch) return; // skip if no player ID
+                const player_id = parseInt(idMatch[1], 10);
+
+                const country = $link.find('img').attr('title') || '';
+
+                const fullNameText = $link.text().trim();
+
+                let first_name = '';
+                let nickname = '';
+                let last_name = '';
+
+                const match = fullNameText.match(/^(.+?)\s+["'](.+)["'](?:\s+(.+))?$/);
+
+                if (match) {
+                    first_name = match[1].trim();
+                    nickname = match[2].trim();
+                    last_name = match[3]?.trim() || '';
+                } else {
+                    const nickMatch = fullNameText.match(/^["'](.+)["']$/);
+                    if (nickMatch) {
+                        nickname = nickMatch[1].trim();
+                    } else {
+                        nickname = fullNameText;
+                    }
+                }
+
+                players.push({
+                    player_id,
+                    first_name,
+                    last_name,
+                    nickname,
+                    country
+                });
+
+                players.forEach(async (player) => {
+                    await this.c.client.configManager.insertPlayerinHLTVDatabase(player)
+                });
+            });
+        });
+        
+        return players;
+    };
+
+    private async handleComponents(players: HltvPlayer[]): Promise<InteractionReplyOptions | number> {
+        const rows = this.createActionRows(players);
+        const embed = this.createComponentEmbed(players);
+
+        await this.createButtonMessage(rows, embed);
+
+        const filter = (i: Interaction) =>
+            i.user.id === this.c.interaction.user.id &&
+            i.isButton() &&
+            i.customId.startsWith('select_player_')
+
+        const buttonInteraction = await this.c.interaction.channel?.awaitMessageComponent({
+            filter,
+            time: 30_000
+        });
+
+        if (!buttonInteraction) {
+            return {
+                content: `No selection made in time.`,
+                components: []
+            };
+        };
+
+        const index = parseInt(buttonInteraction.customId.replace('select_player_', ''), 10);
+        const selectedPlayer = players[index];
+
+        await buttonInteraction.update({
+            content: `You selected: **${selectedPlayer.first_name} '${selectedPlayer.nickname}' ${selectedPlayer.last_name}**\n(Please wait...)`,
+            embeds: [],
+            components: []
+        });
+
+        return index;
+    };
+
+    private async createButtonMessage(rows: ActionRowBuilder<ButtonBuilder>[], embed: EmbedBuilder): Promise<void> {
+        await this.c.interaction.editReply({
+            embeds: [embed],
+            components: rows
+        });
+    }
+
+    private createActionRows(players: HltvPlayer[]): ActionRowBuilder<ButtonBuilder>[] {
+        const rows: ActionRowBuilder<ButtonBuilder>[] = [];
+        let currentRow = new ActionRowBuilder<ButtonBuilder>();
+
+        players.forEach((player, index) => {
+            if (currentRow.components.length === 5) {
+                rows.push(currentRow);
+                currentRow = new ActionRowBuilder<ButtonBuilder>();
+            };
+
+            currentRow.addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`select_player_${index}`)
+                    .setLabel((index + 1).toString())
+                    .setStyle(ButtonStyle.Primary)
+            );
+        });
+
+        if (currentRow.components.length > 0) rows.push(currentRow);
+
+        return rows;
+    };
+
+    private createComponentEmbed(players: HltvPlayer[]): EmbedBuilder {
+        return new EmbedBuilder()
+            .setTitle('Select a player')
+            .setColor(this.c.client.embedOrangeColor)
+            .setDescription(
+                players.map((p, i) => `${i + 1}: ${p.first_name} '${p.nickname}' ${p.last_name}`).join('\n')
+            )
     };
 
     private isBlocked(r: HTTPResponse | null): InteractionReplyOptions | boolean {
@@ -70,7 +346,6 @@ export class player_statsHandler {
         if (!r) {
             payload = {
                 content: 'Navigation failed: Received no HTTP response from HLTV.',
-                flags: MessageFlags.Ephemeral
             };
             return payload;
         };
@@ -78,7 +353,6 @@ export class player_statsHandler {
         if (r.status() === 403) {
             payload = {
                 content: 'HLTV Blocked the Request. (403 Forbidden)',
-                flags: MessageFlags.Ephemeral
             };
             return payload
         };
@@ -106,5 +380,131 @@ export class player_statsHandler {
                 });
             };
         }, [hltvRefs.NAME_WRAPPER]);
+    };
+
+    private getFilters(): [string[], string[]] {
+        const filters: string[] = [];
+        const dateFilter: string[] = [];
+
+        this.gameVersion ? filters.push(this.gameVersion): null;
+
+        this.start_date && this.end_date ? dateFilter.push(this.start_date, this.end_date) : null;
+
+        return [filters, dateFilter];
+    };
+
+    private async scrapeHTML(p: Page, statsUrl: string): Promise<[statsData, AttachmentBuilder]> {
+        const topStatsElement = await p.waitForSelector(hltvRefs.topStatsContainer);
+        const roleStatsElement = await p.waitForSelector(hltvRefs.roleStatsContainer);
+
+        if (!(topStatsElement) || !(roleStatsElement)) {
+            throw new Error('Unable to find the player cards.');
+        };
+
+        const attachement = await this.takeScreenshots(topStatsElement, roleStatsElement);
+
+        const html = await p.content();
+        const $ = cheerio.load(html);
+
+        const statsContainer = $(hltvRefs.summaryStats);
+        const topStats = statsContainer.find(hltvRefs.topStatsContainer);
+
+        const playerFullName = statsContainer.find(hltvRefs.playerBodyShot).attr('alt');
+
+        const mapCount = topStats.find(hltvRefs.mapCount).text().trim();
+
+        const [filters, dateFilter] = this.getFilters();
+
+        const stats = {
+            filters,
+            dateFilter,
+            statsUrl,
+            attachementName: attachement.name as string,
+            playerName: playerFullName as string,
+            mapCount
+        };
+
+        return [stats, attachement];
+    };
+
+    private async takeScreenshots(topStatsElement: ElementHandle<Element>, roleStatsElement: ElementHandle<Element>): Promise<AttachmentBuilder> {
+        const topStatsImageBuffer = await topStatsElement.screenshot({
+            type: 'png'
+        }) as Buffer;
+
+        const roleStatsImageBuffer = await roleStatsElement.screenshot({
+            type: 'png'
+        }) as Buffer;
+
+        const topStatsMetadata = await sharp(topStatsImageBuffer).metadata();
+        const roleStatsMetadata = await sharp(roleStatsImageBuffer).metadata();
+
+        if (!topStatsMetadata.width || !topStatsMetadata.height || !roleStatsMetadata.width || !roleStatsMetadata.height) {
+            throw new Error('Failed to get image dimensions for sharp composition.');
+        };
+
+        const totalHeight = topStatsMetadata.height + roleStatsMetadata.height;
+        const commonWidth = topStatsMetadata.width;
+
+        const combinedImageBuffer = await sharp({
+            create: {
+                width: commonWidth,
+                height: totalHeight,
+                channels: 4,
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            }
+        })
+        .composite([
+            { 
+                input: topStatsImageBuffer, 
+                top: 0, 
+                left: 0 
+            },
+            { 
+                input: roleStatsImageBuffer, 
+                top: topStatsMetadata.height,
+                left: 0 
+            }
+        ])
+        .png()
+        .toBuffer();
+
+        const attachementName = 'hltv_player_card.png';
+        const fileAttachement = new AttachmentBuilder(combinedImageBuffer)
+            .setName(attachementName);
+
+        return fileAttachement;
+    };
+
+    private createEmbed(stats: statsData): EmbedBuilder {
+        let description: string | null = null;
+        if (stats.filters.length > 0 || stats.dateFilter.length > 0) {
+            if (stats.filters.length > 0) {
+                description = `**Filters:** ${stats.filters.join(', ')}`
+            };
+
+            if (stats.filters.length > 0 || stats.dateFilter.length > 0) {
+                description += '\n'
+            };
+
+            if (stats.dateFilter.length > 0) {
+                description += `**Range:** ${stats.dateFilter.join(' - ')}`
+            };
+        };
+
+        if (stats.filters.length > 0 || stats.dateFilter.length > 0) {
+            description += `\n**Map Count:** ${stats.mapCount}`;
+        } else {
+            description = `**Map Count:** ${stats.mapCount}`;
+        };
+
+
+        return new EmbedBuilder()
+            .setTitle(stats.playerName)
+            .setURL(stats.statsUrl)
+            .setImage('attachment://' + stats.attachementName)
+            .setDescription(description)
+            .setColor(this.c.client.embedOrangeColor)
+            .setTimestamp();
     };
 };

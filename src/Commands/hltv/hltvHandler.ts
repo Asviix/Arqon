@@ -1,20 +1,26 @@
 // src\commands\hltv\hltvHandler.ts
 
-import { InteractionReplyOptions, MessageFlags } from "discord.js";
 import { CommandContext } from "@/commands/baseCommand";
+import { InteractionEditReplyOptions, MessageFlags } from "discord.js";
+import { player_statsHandler } from "./player/stats/player_statsHandler";
 
-export async function runMethod(c: CommandContext): Promise<InteractionReplyOptions> {
+export async function runMethod(c: CommandContext): Promise<InteractionEditReplyOptions> {
     const subCommandGroup = c.interaction.options.getSubcommandGroup(true);
     const subCommand = c.interaction.options.getSubcommand(true);
 
-    let payload: InteractionReplyOptions = {
-        content: `How did we get here?`,
-        flags: MessageFlags.Ephemeral
+    let payload: InteractionEditReplyOptions = {
+        content: `How did we get here?`
     };
 
     if (subCommandGroup === 'player') {
         if (subCommand === 'stats') {
-            //execute
+            const h = new player_statsHandler(c);
+            const ephemeral = c.interaction.options.getBoolean('ephemeral', true);
+
+            await c.interaction.deferReply({
+                flags: ephemeral ? MessageFlags.Ephemeral : undefined
+            });
+            payload = await h.main();
         };
     };
 
