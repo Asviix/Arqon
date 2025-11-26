@@ -1,24 +1,25 @@
 // src\Database\MySQLClient.ts
 
 import * as mysql from 'mysql2/promise';
-import { BotClient } from '@/Client/BotClient';
-import { Logger } from '@/Utils/Logger';
+import { BotClient } from '@/client/botClient';
+import { Logger } from '@/utils/logger';
 
-/**
- * Sets a delay to sleep the function.
- * @param delay The delay in miliseconds.
- */
 async function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-/**
- * Interface for the Guild configuration data stored in the database.
- */
 export interface GuildConfig {
     guild_id: string;
     language_code: string;
     joined_on: number;
+};
+
+export interface HltvPlayer {
+    player_id: number;
+    first_name: string;
+    last_name: string;
+    nickname: string;
+    country: string;
 };
 
 export class MySQLClient {
@@ -48,11 +49,6 @@ export class MySQLClient {
         return MySQLClient.instance;
     };
 
-    /**
-     * Executes a simple query.
-     * @param sql The SQL query string.
-     * @param values Values to escape into the query.
-     */
     public async query<T extends mysql.RowDataPacket[] | mysql.ResultSetHeader | mysql.RowDataPacket[][]>(
         sql: string,
         values?: any[]
@@ -61,9 +57,6 @@ export class MySQLClient {
         return rows as T;
     };
 
-    /**
-     * Initializes the necessary tables.
-     */
     public async initializeSchema(): Promise<void> {
         Logger.debug('Initializing Schema...');
         const MAX_RETRIES = 5;
@@ -95,6 +88,18 @@ export class MySQLClient {
                 `;
                 Logger.debug('Creating the bot_logs table...');
                 await this.query(createBotLogsTable);
+
+                const createHltvPlayerDatabase = `
+                    CREATE TABLE IF NOT EXISTS hltv_players_database (
+                        player_id VARCHAR(50) PRIMARY KEY,
+                        first_name TINYTEXT,
+                        last_name TINYTEXT,
+                        nickname TINYTEXT,
+                        country TINYTEXT
+                    );
+                `;
+                Logger.debug('Creating the hltv_players_database table...');
+                await this.query(createHltvPlayerDatabase);
 
                 await this.query(`INSERT INTO bot_logs (session_uid) VALUES (?);`,
                     [this.client.uuid]

@@ -1,6 +1,6 @@
 // src\Events\BaseEvent.ts
 
-import { BotClient } from "@/Client/BotClient";
+import { BotClient } from "@/client/botClient";
 
 export abstract class EventHandler {
     public abstract name: string;

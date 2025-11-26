@@ -1,6 +1,6 @@
 // src\Utils\Logger.ts
 
-import { BotClient } from "@/Client/BotClient";
+import { BotClient } from "@/client/botClient";
 
 /**
  * ANSI color codes for formatting terminal output.
@@ -55,7 +55,7 @@ export class Logger {
 
         const output = `${Colors.Dim}[${timestamp}]${Colors.Reset} ${color}${Colors.Bright}[${tag}]${Colors.Reset} ${message}`;
 
-        console.log(output, ...args);
+        console.log(args.length > 0 ? '\n' + output + '\n' + args.join('\n') : output);
     };
 
     /**

@@ -1,39 +1,33 @@
-// src\Commands\hltv\command.ts
+// src\commands\hltv\command.ts
 
-import { InteractionContextType, InteractionReplyOptions, MessageFlags, SlashCommandBuilder } from 'discord.js';
-import { Command, CommandContext } from '@/Commands/BaseCommand';
-import { runMethod } from "./manager";
+import { Command, CommandContext } from "@/commands/baseCommand";
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
+import { runMethod } from "./hltvHandler";
 
-export default class HLTVCommand extends Command {
+export default class hltvCommand extends Command {
     public cooldown: number = 5;
-    public category: string | null = null
+    public category: string | null = 'HLTV';
 
     public commandData = new SlashCommandBuilder()
         .setName('hltv')
-        .setDescription('Fetch a large amount of data from HLTV.org')
+        .setDescription('Command related to HLTV.')
         .setContexts(InteractionContextType.Guild)
-        .addSubcommand(liveCommand => liveCommand
-            .setName('live')
-            .setDescription('Fetches all the live matches currently on HLTV.')
-        )
-
-        .addSubcommandGroup(playerCommandGroup => playerCommandGroup
+        .addSubcommandGroup(playerGroup => playerGroup
             .setName('player')
-            .setDescription('Gets information about a specific player')
-            .addSubcommand(playerStatsCommand => playerStatsCommand
+            .setDescription('Player related commands.')
+            .addSubcommand(playerStats => playerStats
                 .setName('stats')
-                .setDescription('Gets the stats of a player.')
-                .addStringOption(playerNameOption => playerNameOption
-                    .setName('name')
-                    .setDescription('The name of the player you want the stats of.')
-                    .setRequired(true)
-                )
+                .setDescription('Get a player\'s stats.')
                 .addBooleanOption(ephemeral => ephemeral
                     .setName('ephemeral')
-                    .setDescription('Whether you want to share it to the world! (Or not, we don\'t judge.')
+                    .setDescription('Whether the message should be ephemeral.')
                     .setRequired(true)
                 )
-                .addStringOption(gameVersionOption => gameVersionOption
+                .addStringOption(playerName => playerName
+                    .setName('name')
+                    .setDescription('The name of the player.')
+                    .setRequired(true)
+                ).addStringOption(gameVersionOption => gameVersionOption
                     .setName('game_version')
                     .setDescription('The version of Counter-Strike to get.')
                     .setRequired(false)
@@ -52,51 +46,15 @@ export default class HLTVCommand extends Command {
                     .setDescription('Custom end date (YYYY-MM-DD). Required start_date.')
                     .setRequired(false)
                 )
-                .addStringOption(mapOption => mapOption
-                    .setName('maps')
-                    .setDescription('Specifiy map(s) to retrieve the specific stats of')
-                    .setRequired(false)
-                    .setAutocomplete(true)
-                )
             )
-        ) as SlashCommandBuilder;
+        );
     
     public async execute(c: CommandContext) {
-
-        let returnPayload: InteractionReplyOptions = {
-            content: 'How did we get here ?'
-        };
-
-        const subCommandGroup = c.interaction.options.getSubcommandGroup();
-
-        if (subCommandGroup) {
-            const subCommand = c.interaction.options.getSubcommand();
-            if (subCommandGroup === 'player') {
-                if (subCommand === 'stats') {
-                    const playerName = c.interaction.options.getString('name');
-                    const gameVersion = c.interaction.options.getString('game_version');
-                    const startDate = c.interaction.options.getString('start_date');
-                    const endDate = c.interaction.options.getString('end_date');
-                    const mapInput = c.interaction.options.getString('maps');
-                    const ephemeral = c.interaction.options.getBoolean('ephemeral');
-                    if (ephemeral) {
-                        await c.interaction.deferReply({
-                            flags: MessageFlags.Ephemeral
-                        });
-                    } else {
-                        await c.interaction.deferReply();
-                    };
-                    returnPayload = await runMethod(c, subCommand, playerName, gameVersion, startDate, endDate, mapInput);
-                }
-            }
-
-        } else {
-            const subCommand = c.interaction.options.getSubcommand();
-            if (subCommand === 'live') {
-                returnPayload = await runMethod(c, subCommand);
-            };
-        };
-
-        await c.interaction.followUp(returnPayload);
+      const payload = await runMethod(c);
+      if (c.interaction.replied || c.interaction.deferred) {
+        await c.interaction.editReply(payload);
+      } else {
+        await c.interaction.reply(payload);
+      };
     };
 };

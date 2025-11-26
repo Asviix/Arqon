@@ -1,14 +1,14 @@
 // src\Client\BotClient.ts
 
-import { Client, Collection, ClientOptions, ColorResolvable } from 'discord.js';
+import { Command } from '@/commands/baseCommand';
+import { GuildConfig, HltvPlayer, MySQLClient } from '@/database/mySQLClient';
+import { EventHandler } from '@/events/baseEvent';
+import { ConfigManager } from '@/managers/configManager';
+import { LocaleStrings, LocalizationManager } from '@/managers/localizationManager';
+import { BrowserService } from '@/utils/browserService';
+import { Logger } from '@/utils/logger';
+import { Client, ClientOptions, Collection, ColorResolvable } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
-import { BrowserService } from '@/Utils/BrowserService';
-import { EventHandler } from '@/Events/BaseEvent';
-import { ConfigManager } from '@/Managers/ConfigManager';
-import { Command } from '@/Commands/BaseCommand';
-import { LocaleStrings, LocalizationManager } from '@/Managers/LocalizationManager';
-import { Logger } from '@/Utils/Logger';
-import { MySQLClient, GuildConfig } from '@/Database/MySQLClient';
 
 /**
  * The BotClient class that extends client.
@@ -19,7 +19,8 @@ export class BotClient extends Client {
     // Interfaces
     public locales: LocaleStrings = {};
     public guildConfigs: Collection<string, GuildConfig> = new Collection();
-    public isProd: boolean = process.argv.includes('--env=production');
+    public hltvPlayerDBbyID: Collection<number, HltvPlayer> = new Collection();
+    public hltvPlayerDBbyNick: Collection<string, number[]> = new Collection();
 
     // Classes
     public commands: Collection<string, Command> = new Collection();
@@ -34,6 +35,7 @@ export class BotClient extends Client {
     public embedOrangeColor: ColorResolvable = '#ffa200';
 
     // Misc
+    public isProd: boolean = process.argv.includes('--env=production');
     public uuid: string = uuidv4();
     public sessionCounters = {
         commandsRan: 0,

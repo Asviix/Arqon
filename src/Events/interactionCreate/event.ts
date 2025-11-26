@@ -1,100 +1,59 @@
-// src\Events\interactionCreate\event.ts
+// src\events\interactionCreate\event.ts
 
-import { Interaction, MessageFlags } from "discord.js";
-import { BotClient } from "@/Client/BotClient";
-import { EventHandler } from "@/Events/BaseEvent";
-import { CommandContext } from "@/Commands/BaseCommand";
-import { createTranslator } from "@/Utils/TranslatorHelper";
-import { interactionErrorReply, isCooldown} from "./methods";
-import { Logger } from "@/Utils/Logger";
+import { BotClient } from "@/client/botClient";
+import { EventHandler } from "@/events/baseEvent";
+import { Logger } from "@/utils/logger";
+import { ChatInputCommandInteraction, Interaction, InteractionReplyOptions } from 'discord.js';
+import { InteractionCreateHandler } from "./services/handler";
 
 export default class InteractionCreateEvent extends EventHandler {
     public name = 'interactionCreate';
     public once = false
 
     public async execute(client: BotClient, interaction: Interaction): Promise<void> {
-
-        const languageCode = (await client.configManager.getCachedGuildConfig(interaction.guildId!)).language_code;
-        const _ = createTranslator(client, languageCode);
-
-        const VALID_MAPS: string[] = ['de_ancient', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_anubis', 'de_cache', 'de_cobblestone', 'de_season', 'de_tuscan', 'de_vertigo'];
-
-        let responseText: string;
-
-        if (interaction.isAutocomplete()) {
-            const focusedOption = interaction.options.getFocused(true);
-            const commandName = interaction.commandName;
-
-            if (focusedOption.name === 'maps' && commandName === 'hltv') {
-                const fullInput = focusedOption.value;
-
-                const parts = fullInput.split(',');
-                const currentSearch = parts[parts.length - 1].trim().toLowerCase();
-
-                const filtered = VALID_MAPS
-                    .filter(map => map.toLowerCase().includes(currentSearch))
-                    .slice(0, 25);
-
-                await interaction.respond(
-                    filtered.map(map => ({ name: map, value: map}))
-                );
-            } else if (focusedOption.name === 'command' && commandName === 'help') {
-                const fullInput = focusedOption.value;
-
-                const currentSearch = fullInput.trim().toLowerCase();
-
-                const filtered = client.commands
-                    .filter(command => command.name.toLowerCase().includes(currentSearch))
-                    .map(command => ({ name: command.name, value: command.name}))
-                    .slice(0, 25);
-
-                await interaction.respond(
-                    filtered
-                );
-            }
+        /*
+        if (interaction.isChatInputCommand() && interaction.command) {
+            const test = interaction.command.options;
+            test.forEach((option) => {
+                console.log((option as ApplicationCommandSubCommand).options![0].name)           
+            });
         };
+        */
+        // KEEP AS PROOF OF CONCEPT FOR HELP COMMAND HANDLING
 
-        if (!interaction.isChatInputCommand()) return;
+        const h = new InteractionCreateHandler(client, interaction);
 
-        const command = client.commands.get(interaction.commandName);
-        if (!command) {
-            Logger.error(`Command not found: /${interaction.commandName}`);
-            await interaction.reply(
-                {
-                    content: _.BASE_ERROR_COMMAND_NOT_FOUND(),
-                    flags:MessageFlags.Ephemeral
-                }
-            );
+        const handlerResult = await h.main();
+
+        if (!(interaction instanceof ChatInputCommandInteraction)) {
             return;
         };
 
-        const c: CommandContext = {
-            client,
-            interaction,
-            languageCode,
-            _
-        }
-
-        try {
-            const [userInCooldown, remaining] = await isCooldown(client, interaction.user.id, command);
-
-            if (userInCooldown) {
-                responseText = _.COOLDOWN({
-                    seconds: remaining.toString(),
-                    commandName: interaction.commandName
-                });
-
-                return await interactionErrorReply(responseText, interaction);
+        if (Array.isArray(handlerResult)) {
+            const [command, c] = handlerResult;
+            try {
+                await command.execute(c);
+            } catch (e) {
+                await this.interractionErrorReply({
+                    content: c._.ERROR_GENERIC(),
+                    ephemeral: true
+                }, interaction);
+                return Logger.error(`Error executing command /${c.interaction.commandName}:\n`, e);
             };
-            client.sessionCounters.commandsRan += 1;
 
-            await command.execute(c);
-        } catch (error) {
-            responseText = _.ERROR_GENERIC();
+        } else if (handlerResult) {
+            await this.interractionErrorReply(handlerResult, interaction);
+            return;
+        };
 
-            interactionErrorReply(responseText, interaction);
+        process.nextTick(() => h.dispose());
+    };    
 
-            Logger.error(`Error executing command /${interaction.commandName}:\n`, error);
+    private async interractionErrorReply(payload: InteractionReplyOptions, i: ChatInputCommandInteraction): Promise<void> {
+        if (i.replied || i.deferred) {
+            await i.followUp(payload);
+        } else {
+            await i.reply(payload);
         };
     };
 };

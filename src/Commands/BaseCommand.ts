@@ -7,8 +7,8 @@ import {
     SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
 
-import { BotClient } from '@/Client/BotClient';
-import { BoundTranslatorObject } from '@/Utils/TranslatorHelper';
+import { BotClient } from '@/client/botClient';
+import { BoundTranslatorObject } from '@/utils/translatorHelper';
 
 export interface CommandContext {
     readonly client: BotClient,

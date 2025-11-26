@@ -1,9 +1,9 @@
 // src/Locales/TranslatorHelper.ts
 
-import { BotClient } from '@/Client/BotClient';
-import { LocalizationKeys } from '@/Locales/data/keys';
-import { LocaleArgsMap } from '@/Locales/data/interfaces';
-import { DEFAULT_LOCALE } from '@/Managers/LocalizationManager';
+import { BotClient } from '@/client/botClient';
+import { LocalizationKeys } from '@/locales/data/keys';
+import { LocaleArgsMap } from '@/locales/data/interfaces';
+import { DEFAULT_LOCALE } from '@/managers/localizationManager';
 
 type ArgRequiredKeys = { 
     [K in LocalizationKeys]: LocaleArgsMap[K] extends void ? never : K 
