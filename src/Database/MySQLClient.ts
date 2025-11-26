@@ -3,31 +3,18 @@
 import * as mysql from 'mysql2/promise';
 import { BotClient } from '@/client/botClient';
 import { Logger } from '@/utils/logger';
+import { GuildConfig } from '@/config/interfaces';
+import { HltvPlayer } from '@/config/interfaces';
 
 async function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export interface GuildConfig {
-    guild_id: string;
-    language_code: string;
-    joined_on: number;
-};
-
-export interface HltvPlayer {
-    player_id: number;
-    first_name: string;
-    last_name: string;
-    nickname: string;
-    country: string;
-};
-
 export class MySQLClient {
     private static instance: MySQLClient
     private pool: mysql.Pool;
-    private client: BotClient;
 
-    private constructor(client: BotClient) {
+    private constructor() {
         this.pool = mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
@@ -37,14 +24,13 @@ export class MySQLClient {
             connectionLimit: 10,
             queueLimit: 0,
         });
-        this.client = client;
         Logger.info('Database pool created.');
     };
 
-    public static getInstance(client: BotClient): MySQLClient {
+    public static getInstance(): MySQLClient {
         if (!MySQLClient.instance) {
             Logger.debug('Creating MYSQLClient instance...')
-            MySQLClient.instance = new MySQLClient(client);
+            MySQLClient.instance = new MySQLClient();
         };
         return MySQLClient.instance;
     };
@@ -55,6 +41,10 @@ export class MySQLClient {
     ): Promise<T> {
         const [rows] = await this.pool.execute(sql, values);
         return rows as T;
+    };
+
+    public async getConnection(): Promise<mysql.PoolConnection> {
+        return this.pool.getConnection();
     };
 
     public async initializeSchema(): Promise<void> {
@@ -102,7 +92,7 @@ export class MySQLClient {
                 await this.query(createHltvPlayerDatabase);
 
                 await this.query(`INSERT INTO bot_logs (session_uid) VALUES (?);`,
-                    [this.client.uuid]
+                    ['test']
                 );
 
                 Logger.success('Database schema initialized!')
@@ -117,30 +107,6 @@ export class MySQLClient {
             };
 
             await sleep(TIMEOUT);
-        };
-    };
-
-    public async syncSessionCounters(): Promise<void> {
-        const { commandsRan, warningsLogged, errorsLogged } = this.client.sessionCounters;
-        const sessionId = this.client.uuid;
-
-        if (!sessionId || (commandsRan === 0 && warningsLogged === 0 && errorsLogged === 0)) {
-            return;
-        };
-
-        try {
-            await this.query(
-                `UPDATE bot_logs SET commands_ran = commands_ran + ?, warnings_logged = warnings_logged + ?, errors_logged = errors_logged + ? WHERE session_uid = ?`,
-                [commandsRan, warningsLogged, errorsLogged, sessionId]
-            );
-
-            this.client.sessionCounters.commandsRan = 0;
-            this.client.sessionCounters.warningsLogged = 0;
-            this.client.sessionCounters.errorsLogged = 0;
-
-            Logger.debug('Session counters synced to database.');
-        } catch (error) {
-            Logger.error('Failed to sync session counters to DB!', error);
         };
     };
 };

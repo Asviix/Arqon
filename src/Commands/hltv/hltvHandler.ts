@@ -1,6 +1,6 @@
 // src\commands\hltv\hltvHandler.ts
 
-import { CommandContext } from "@/commands/baseCommand";
+import { CommandContext } from "@/commands/BaseCommand";
 import { BaseMessageOptions, MessageFlags } from "discord.js";
 import { player_statsHandler } from "./player/stats/player_statsHandler";
 

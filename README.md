@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.0.3 - FILL OUT DATE BEFORE PUSHING THE MAIN
+## 0.0.4 - NEW DATE
+
+### Changed
+
+#### **Config Manager:**
+
+- Complete architectural rework and refactor of everything related to the Configs, Caches, and Database. ([`#15`](https://github.com/Asviix/Arqon/issues/15))
+
+## 0.0.3 - 2025-11-26
 
 ### Added
 

@@ -1,11 +1,13 @@
 // src\Client\BotClient.ts
 
-import { Command } from '@/commands/baseCommand';
-import { GuildConfig, HltvPlayer, MySQLClient } from '@/database/mySQLClient';
-import { EventHandler } from '@/events/baseEvent';
-import { ConfigManager } from '@/managers/configManager';
+import { Command } from '@/commands/BaseCommand';
+import * as i from '@/config/interfaces';
+import { MySQLClient } from '@/database/mySQLClient';
+import { initSchema } from '@/database/transaction';
+import { EventHandler } from '@/events/BaseEvent';
+import { ConfigManager } from '@/managers/ConfigManager';
 import { LocaleStrings, LocalizationManager } from '@/managers/localizationManager';
-import { BrowserService } from '@/utils/browserService';
+import { BrowserService } from '@/utils/BrowserService';
 import { Logger } from '@/utils/logger';
 import { Client, ClientOptions, Collection, ColorResolvable } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -18,8 +20,8 @@ export class BotClient extends Client {
 
     // Interfaces
     public locales: LocaleStrings = {};
-    public guildConfigs: Collection<string, GuildConfig> = new Collection();
-    public hltvPlayerDBbyID: Collection<number, HltvPlayer> = new Collection();
+    public guildConfigs: Collection<string, i.GuildConfig> = new Collection();
+    public hltvPlayerDBbyID: Collection<number, i.HltvPlayer> = new Collection();
     public hltvPlayerDBbyNick: Collection<string, number[]> = new Collection();
 
     // Classes
@@ -37,11 +39,6 @@ export class BotClient extends Client {
     // Misc
     public isProd: boolean = process.argv.includes('--env=production');
     public uuid: string = uuidv4();
-    public sessionCounters = {
-        commandsRan: 0,
-        warningsLogged: 0,
-        errorsLogged: 0
-    };
 
     private constructor(options: ClientOptions) {
         super(options);
@@ -59,13 +56,13 @@ export class BotClient extends Client {
 
         // Get the instances for singletons.
         this.browserService = BrowserService.getInstance();
-        this.db = MySQLClient.getInstance(this);
+        this.db = MySQLClient.getInstance();
         this.localizationManager = LocalizationManager.getInstance(this);
         this.configManager = ConfigManager.getInstance(this, this.db);
 
         // Initialize required services.
         await this.browserService.launchBrowser();
-        await this.db.initializeSchema();
+        initSchema(this.uuid);
 
         Logger.init(this)
 
