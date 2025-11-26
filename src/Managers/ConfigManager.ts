@@ -75,15 +75,22 @@ export class ConfigManager {
 
     public async insertPlayerinHLTVDatabase(data: HltvPlayer): Promise<void> {
         await this.db.query(
-            `INSERT INTO hltv_players_database (player_id, first_name, last_name, nickname, country) VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO hltv_players_database 
+                (player_id, first_name, last_name, nickname, country)
+            VALUES (?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                first_name = VALUES(first_name),
+                last_name = VALUES(last_name),
+                nickname = VALUES(nickname),
+                country = VALUES(country)`,
             [data.player_id, data.first_name, data.last_name, data.nickname, data.country]
         );
     };
 
     public async getHLTVPlayer(playerNick: string): Promise<HltvPlayer[] | null> {
         const rows = await this.db.query<mysql.RowDataPacket[]>(
-            `SELECT * FROM hltv_players_database WHERE nickname = ?`,
-            [playerNick]
+            `SELECT * FROM hltv_players_database WHERE nickname LIKE ?`,
+            [`%${playerNick}%`]
         );
 
         if (rows && rows.length > 0) {
@@ -110,10 +117,12 @@ export class ConfigManager {
         };
     };
 
-    public getCachedHLTVPlayer(playerNick: string): HltvPlayer[] | null {
+    public async getCachedHLTVPlayer(playerNick: string): Promise<HltvPlayer[] | null> {
         const ids = this.client.hltvPlayerDBbyNick.get(playerNick.toLowerCase());
 
-        if (!ids) return null;
+        if (!ids) {
+            return null;
+        };
 
         const players = ids
             .map(id => this.client.hltvPlayerDBbyID.get(id))

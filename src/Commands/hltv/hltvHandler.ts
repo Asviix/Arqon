@@ -1,14 +1,14 @@
 // src\commands\hltv\hltvHandler.ts
 
 import { CommandContext } from "@/commands/baseCommand";
-import { InteractionEditReplyOptions, MessageFlags } from "discord.js";
+import { BaseMessageOptions, MessageFlags } from "discord.js";
 import { player_statsHandler } from "./player/stats/player_statsHandler";
 
-export async function runMethod(c: CommandContext): Promise<InteractionEditReplyOptions> {
+export async function runMethod(c: CommandContext): Promise<BaseMessageOptions> {
     const subCommandGroup = c.interaction.options.getSubcommandGroup(true);
     const subCommand = c.interaction.options.getSubcommand(true);
 
-    let payload: InteractionEditReplyOptions = {
+    let payload: BaseMessageOptions = {
         content: `How did we get here?`
     };
 

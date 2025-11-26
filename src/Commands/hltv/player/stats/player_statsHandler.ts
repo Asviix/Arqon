@@ -3,11 +3,12 @@
 import { CommandContext } from "@/commands/baseCommand";
 import { HltvPlayer } from "@/database/mySQLClient";
 import * as cheerio from "cheerio";
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, InteractionEditReplyOptions, InteractionReplyOptions } from "discord.js";
+import { ActionRowBuilder, AttachmentBuilder, BaseMessageOptions, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction } from "discord.js";
 import { ElementHandle, HTTPResponse, Page } from "puppeteer";
 import sharp from "sharp";
 import { hltvRefs } from "./data/hltvRefs";
 import { statsData } from "./data/interfaces";
+import { readFileSync } from "fs";
 
 export class player_statsHandler {
     private c: CommandContext
@@ -26,13 +27,13 @@ export class player_statsHandler {
         this.end_date = this.c.interaction.options.getString('end_date');
     };
 
-    public async main(): Promise<InteractionEditReplyOptions> {
-        let payload: InteractionEditReplyOptions;
+    public async main(): Promise<BaseMessageOptions> {
+        let payload: BaseMessageOptions;
 
         if (this.start_date && this.end_date) {
             let isDateValid = this.validateDate();
             if (isDateValid) {
-                return payload = isDateValid as InteractionEditReplyOptions;
+                return payload = isDateValid as BaseMessageOptions;
             };
         };
 
@@ -43,7 +44,7 @@ export class player_statsHandler {
         const statsUrl = await this.getStatsUrl(page);
 
         if (!(typeof statsUrl === 'string')) {
-            return payload = statsUrl as InteractionEditReplyOptions;
+            return payload = statsUrl as BaseMessageOptions;
         };
 
         const httpReponse: HTTPResponse | null = await page.goto(statsUrl, {
@@ -51,10 +52,12 @@ export class player_statsHandler {
             referer: 'https://hltv.org',
             timeout: 10000
         });
+        
         const blockage = this.isBlocked(httpReponse);
 
         if (blockage) {
-            return payload = blockage as InteractionEditReplyOptions;
+            this.c.client.browserService.closeBrowser();
+            return payload = blockage as BaseMessageOptions;
         };
 
         this.adjustCSS(page);
@@ -74,8 +77,8 @@ export class player_statsHandler {
         return payload;
     };
 
-    private validateDate(): InteractionReplyOptions | boolean {
-        let payload: InteractionReplyOptions;
+    private validateDate(): BaseMessageOptions | boolean {
+        let payload: BaseMessageOptions;
 
         function isValidDateString(dateStr: string): boolean {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
@@ -98,7 +101,7 @@ export class player_statsHandler {
         if (this.start_date && this.end_date) {
             if (!isValidDateString(this.start_date) || !isValidDateString(this.end_date)) {
                 payload = {
-                    content: 'Invalid date format or value. Please use YYYY-MM-DD.',
+                    content: this.c._.COMMAND_HLTV_PLAYER_STATS_INVALID_DATE_FORMAT(),
                 };
                 return payload;
             };
@@ -120,38 +123,41 @@ export class player_statsHandler {
         });
     };
 
-    private async getStatsUrl(p: Page): Promise<string | InteractionReplyOptions> {
+    private async getStatsUrl(p: Page): Promise<string | BaseMessageOptions> {
         const players = await this.getPlayers(p, this.playerName);
 
         if (!players) {
             return {
-                content: 'Your search returned no result.',
+                content: this.c._.COMMAND_HLTV_PLAYER_STATS_SEARCH_NO_RESULT(),
             };
         };
 
         let playerId;
         let playerName;
 
+        let userResponse: number | BaseMessageOptions;
+
         if (players.length === 1) {
-            playerId = players[0].player_id;
-            playerName = players[0].nickname;
+            userResponse = 0;
         } else {
-            const userResponse = await this.handleComponents(players);
+            userResponse = await this.handleComponents(players);
             if (typeof userResponse !== 'number') {
                 return userResponse;
             };
-
-            playerId = players[userResponse].player_id;
-            playerName = players[userResponse].nickname;
         };
+
+        playerId = players[userResponse].player_id;
+        playerName = players[userResponse].nickname;
 
         const sanitizedNickname = playerName.replace(/\s+/g, '-');
 
         let statsUrl: string = hltvRefs.STATS_URL
             .replace('[id]', playerId.toString())
-            .replace('[player]', sanitizedNickname);
+            .replace('[player]', (Math.random().toString(36).slice(2, 8)));
 
         let queryParams: string[] = [];
+
+        queryParams.push()
 
         if (this.gameVersion) {
             queryParams.push(`csVersion=${this.gameVersion}`);
@@ -169,7 +175,7 @@ export class player_statsHandler {
     };
 
     private async getPlayers(p: Page, query: string): Promise<HltvPlayer[] | void> {
-        const cachedPlayer = this.c.client.configManager.getCachedHLTVPlayer(query);
+        const cachedPlayer = await this.c.client.configManager.getCachedHLTVPlayer(query);
         if (cachedPlayer) {
             return cachedPlayer
         };
@@ -180,6 +186,10 @@ export class player_statsHandler {
         };
 
         const players = await this.fetchPlayersFromHLTV(p, query)
+
+        players.forEach(async (player) => {
+            await this.c.client.configManager.insertPlayerinHLTVDatabase(player);
+        });
 
         return players;
     };
@@ -256,17 +266,13 @@ export class player_statsHandler {
                     nickname,
                     country
                 });
-
-                players.forEach(async (player) => {
-                    await this.c.client.configManager.insertPlayerinHLTVDatabase(player)
-                });
             });
         });
         
         return players;
     };
 
-    private async handleComponents(players: HltvPlayer[]): Promise<InteractionReplyOptions | number> {
+    private async handleComponents(players: HltvPlayer[]): Promise<BaseMessageOptions | number> {
         const rows = this.createActionRows(players);
         const embed = this.createComponentEmbed(players);
 
@@ -277,15 +283,26 @@ export class player_statsHandler {
             i.isButton() &&
             i.customId.startsWith('select_player_')
 
-        const buttonInteraction = await this.c.interaction.channel?.awaitMessageComponent({
-            filter,
-            time: 30_000
-        });
+        let buttonInteraction;
+
+        try {
+            buttonInteraction = await this.c.interaction.channel?.awaitMessageComponent({
+                filter,
+                time: 30_000
+            });
+        } catch (e) {
+            return {
+                content: this.c._.COMMAND_HLTV_PLAYER_STATS_MENU_NO_SELECTION(),
+                components: [],
+                embeds: []
+            };
+        };
 
         if (!buttonInteraction) {
             return {
-                content: `No selection made in time.`,
-                components: []
+                content: this.c._.COMMAND_HLTV_PLAYER_STATS_MENU_NO_INTERACT(),
+                components: [],
+                embeds: []
             };
         };
 
@@ -293,20 +310,13 @@ export class player_statsHandler {
         const selectedPlayer = players[index];
 
         await buttonInteraction.update({
-            content: `You selected: **${selectedPlayer.first_name} '${selectedPlayer.nickname}' ${selectedPlayer.last_name}**\n(Please wait...)`,
+            content: `${this.c._.COMMAND_HLTV_PLAYER_STATS_MENU_SELECT_RESULT()} **${selectedPlayer.first_name} '${selectedPlayer.nickname}' ${selectedPlayer.last_name}**...`,
             embeds: [],
             components: []
         });
 
         return index;
     };
-
-    private async createButtonMessage(rows: ActionRowBuilder<ButtonBuilder>[], embed: EmbedBuilder): Promise<void> {
-        await this.c.interaction.editReply({
-            embeds: [embed],
-            components: rows
-        });
-    }
 
     private createActionRows(players: HltvPlayer[]): ActionRowBuilder<ButtonBuilder>[] {
         const rows: ActionRowBuilder<ButtonBuilder>[] = [];
@@ -340,19 +350,26 @@ export class player_statsHandler {
             )
     };
 
-    private isBlocked(r: HTTPResponse | null): InteractionReplyOptions | boolean {
-        let payload: InteractionReplyOptions;
+    private async createButtonMessage(rows: ActionRowBuilder<ButtonBuilder>[], embed: EmbedBuilder): Promise<void> {
+        await this.c.interaction.editReply({
+            embeds: [embed],
+            components: rows
+        });
+    };
+
+    private isBlocked(r: HTTPResponse | null): BaseMessageOptions | boolean {
+        let payload: BaseMessageOptions;
 
         if (!r) {
             payload = {
-                content: 'Navigation failed: Received no HTTP response from HLTV.',
+                content: this.c._.COMMAND_HLTV_NAVIG_FAIL_NO_RESPONSE(),
             };
             return payload;
         };
 
         if (r.status() === 403) {
             payload = {
-                content: 'HLTV Blocked the Request. (403 Forbidden)',
+                content: this.c._.COMMAND_HLTV_NAVIG_FAIL_403(),
             };
             return payload
         };

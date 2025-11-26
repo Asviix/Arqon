@@ -1,7 +1,7 @@
 // src\commands\hltv\command.ts
 
 import { Command, CommandContext } from "@/commands/baseCommand";
-import { InteractionContextType, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 import { runMethod } from "./hltvHandler";
 
 export default class hltvCommand extends Command {
@@ -51,6 +51,10 @@ export default class hltvCommand extends Command {
     
     public async execute(c: CommandContext) {
       const payload = await runMethod(c);
-      await c.interaction.editReply(payload);
-    }
+      if (c.interaction.replied || c.interaction.deferred) {
+        await c.interaction.editReply(payload);
+      } else {
+        await c.interaction.reply(payload);
+      };
+    };
 };
