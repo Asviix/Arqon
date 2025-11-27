@@ -1,10 +1,4 @@
-// src\config\interfaces.ts
-
-export interface GuildConfig {
-    guild_id: string;
-    language_code: string;
-    joined_on: number;
-};
+// src\interfaces\shared.ts
 
 export interface HltvPlayer {
     player_id: number;

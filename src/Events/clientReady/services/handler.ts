@@ -47,7 +47,7 @@ export class ReadyHandler {
 
     private async _registerCommands(): Promise<void> {
         const commandData: ApplicationCommandDataResolvable[] = Array.from(this.c.commands.values()).map(c => c.commandData);
-        Logger.command(`Registering ${commandData.length} guild commands...`)
+        Logger.debug(`Registering ${commandData.length} guild commands...`)
 
         let ca: ClientApplication | null = this.c.application;
         if (!ca) {

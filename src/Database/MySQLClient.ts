@@ -1,10 +1,7 @@
 // src\Database\MySQLClient.ts
 
-import * as mysql from 'mysql2/promise';
-import { BotClient } from '@/client/botClient';
 import { Logger } from '@/utils/logger';
-import { GuildConfig } from '@/config/interfaces';
-import { HltvPlayer } from '@/config/interfaces';
+import * as mysql from 'mysql2/promise';
 
 async function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));

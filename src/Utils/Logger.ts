@@ -30,21 +30,10 @@ export class Logger {
         Logger.client = client;
     };
 
-    /**
-     * Sets the logging environement status.
-     * @param env True if the environement is production (debug OFFà.)
-     */
     public static setEnvironment(env: boolean) {
         Logger.isDev = !env
     };
 
-    /**
-     * Formats the log message with a timestamp and category tag.
-     * @param tag The category tag (e.g., INFO, ERROR).
-     * @param color the ANSI color code for the tag
-     * @param message the message to log.
-     * @param args Additional objects to log (e.g., error objects).
-     */
     private static format(tag: string, color: string, message: any, ...args: any[]) {
         const timestamp = new Date().toLocaleDateString('en-US', {
             hour12: false,
@@ -58,74 +47,25 @@ export class Logger {
         console.log(args.length > 0 ? '\n' + output + '\n' + args.join('\n') : output);
     };
 
-    /**
-     * Logs general information messages (White).
-     * @param message 
-     * @param args 
-     */
     public static info(message: any, ...args: any[]) {
         Logger.format('INFO', Colors.FgCyan, message, ...args);
     };
 
-    /**
-     * Logs successfull actions (Green).
-     * @param message 
-     * @param args 
-     */
     public static success(message: any, ...args: any[]) {
         Logger.format('SUCCESS', Colors.FgGreen, message, ...args);
     };
 
-    /**
-     * Logs warnings (Yellow).
-     * @param message 
-     * @param args 
-     */
     public static warn(message: any, ...args: any[]) {
-        if (Logger.client) {
-            Logger.client.sessionCounters.warningsLogged += 1;
-        };
         Logger.format('WARN', Colors.FgYellow, message, ...args);
     };
 
-    /**
-     * Logs errors and exceptions (Red).
-     * @param message 
-     * @param args 
-     */
     public static error(message: any, ...args: any[]) {
-        if (Logger.client) {
-            Logger.client.sessionCounters.errorsLogged += 1;
-        };
         Logger.format('ERROR', Colors.FgRed, message, ...args);
     };
 
-    /**
-     * Logs debugging messages (Magenta) - Can be toggled off for production.
-     * @param message 
-     * @param args 
-     */
     public static debug(message: any, ...args: any[]) {
         if (Logger.isDev) {
             Logger.format('DEBUG', Colors.FgMagenta, message, ...args);
         };
-    };
-
-    /**
-     * Logs messages related to the Event Handler loading and Registration (Blue)
-     * @param message 
-     * @param args 
-     */
-    public static event(message: any, ...args: any[]) {
-        Logger.format('EVENT', Colors.FgBlue, message, ...args);
-    };
-
-    /**
-     * Logs messages related to the Command Handler loading and Registration (Yellow)
-     * @param message 
-     * @param args 
-     */
-    public static command(message: any, ...args: any[]) {
-        Logger.format('COMMAND', Colors.FgYellow, message, ...args);
     };
 };

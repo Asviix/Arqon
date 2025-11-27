@@ -46,7 +46,7 @@ export class EventLoadHandler {
                         };
 
                         this.client.eventFiles.set(event.name, event);
-                        Logger.event(`Event Loaded: ${event.name} (Once: ${event.once})`);
+                        Logger.debug(`Event Loaded: ${event.name} (Once: ${event.once})`);
                     };
                 };
             };
