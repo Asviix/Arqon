@@ -11,7 +11,7 @@ export default class GuildCreateEvent extends EventHandler {
     public async execute(client: BotClient, guild: Guild): Promise<void> {
         const NEW_GUILD_ID = guild.id;
 
-        client.configManager.initializeGuildConfig(NEW_GUILD_ID);
+        await client.configManager.set('guildConfig', NEW_GUILD_ID);
 
         return;
     };

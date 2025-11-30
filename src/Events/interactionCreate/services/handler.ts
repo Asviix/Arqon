@@ -24,11 +24,11 @@ export class InteractionCreateHandler {
         let i: ChatInputCommandInteraction = this.i;
 
 
-        this.c.sessionCounters.commandsRan += 1;
         let languageCode: string = DEFAULT_LOCALE;
 
         if (typeof this.i.guildId === 'string') {
-            languageCode = (await this.c.configManager.getCachedGuildConfig(this.i.guildId)).language_code;
+            const guild = await this.c.configManager.get('guildConfig', this.i.guildId);
+            if (guild) languageCode = guild.language_code;
         };
 
         const _ = createTranslator(this.c, languageCode);

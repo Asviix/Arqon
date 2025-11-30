@@ -44,8 +44,6 @@ export class ShutdownHandler {
 
     private async restartApp(): Promise<void> {
         Logger.info(`Shutting Down... (sent restart code to PM2) Ordered by ${this.c.interaction.user.displayName} (${this.c.interaction.user.id}) in ${this.c.interaction.guild!.name} (${this.c.interaction.guildId}) on ${new Date().toLocaleString('en-GB')}`);
-
-        await this.c.client.db.syncSessionCounters();
         this.c.client.destroy();
 
         process.exit(105);
@@ -53,8 +51,6 @@ export class ShutdownHandler {
 
     private async shutdownApp(): Promise<void> {
         Logger.info(`Shutting down gracefully... Ordered by ${this.c.interaction.user.displayName} (${this.c.interaction.user.id}) in ${this.c.interaction.guild!.name} (${this.c.interaction.guildId}) on ${new Date().toLocaleString('en-GB')}`);
-
-        await this.c.client.db.syncSessionCounters();
         
         this.c.client.destroy();
         process.exit(0);

@@ -5,3 +5,11 @@ export interface GuildConfig {
     language_code: string;
     joined_on: number;
 };
+
+export interface BotLogs {
+    session_uid: string;
+    timestamp: Date;
+    commands_ran: Number;
+    warnings_logged: Number;
+    errors_logged: Number;
+};

@@ -1,0 +1,30 @@
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model BotLogs {
+  session_uid String @id @db.Char(36)
+  timestamp DateTime @default(now())
+  commands_ran Int @db.SmallInt @default(0)
+  warnings_logged Int @db.SmallInt @default(0)
+  errors_logged Int @db.SmallInt @default(0)
+}
+
+model GuildConfig {
+  guild_id String@id @db.VarChar(20)
+  language_code String @db.VarChar(10) @default("en-US")
+  joined_on DateTime @default(now())
+}
+
+model HltvPlayer {
+  player_id String@id @db.VarChar(50)
+  first_name String? @db.TinyText
+  last_name String? @db.TinyText
+  nickname String? @db.TinyText
+  country String? @db.TinyText
+}

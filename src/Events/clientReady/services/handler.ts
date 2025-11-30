@@ -29,7 +29,8 @@ export class ReadyHandler {
 
         const promises = [
             this._registerCommands(),
-            this._editPinnedMessage()
+            this._editPinnedMessage(),
+            this.c.configManager.set('botLogs', this.c.uuid)
         ];
 
         this._setActivity();

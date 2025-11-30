@@ -1,38 +1,26 @@
 // src\Client\BotClient.ts
 
-import { Command } from '@/commands/BaseCommand';
-import { MySQLClient } from '@/database/mySQLClient';
-import { EventHandler } from '@/events/BaseEvent';
-import * as dbI from '@/interfaces/dbConfig';
-import * as dbS from '@/interfaces/shared';
-import { CacheManager } from '@/managers/cacheManager';
-import { ConfigManager } from '@/managers/ConfigManager';
+import { Command } from '@/commands/baseCommand';
+import { EventHandler } from '@/events/baseEvent';
+import { ConfigManager } from '@/managers/configManager';
 import { LocaleStrings, LocalizationManager } from '@/managers/localizationManager';
-import { BrowserService } from '@/utils/BrowserService';
-import { Logger } from '@/utils/Logger';
+import { BrowserService } from '@/utils/browserService';
+import { Logger } from '@/utils/logger';
 import { Client, ClientOptions, Collection, ColorResolvable } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * The BotClient class that extends client.
- */
 export class BotClient extends Client {
     private static instance: BotClient;
 
     // Interfaces
     public locales: LocaleStrings = {};
-    public guildConfigsCache: Collection<string, dbI.GuildConfig> = new Collection();
-    public hltvPlayersCacheNick: Collection<string, number[]> = new Collection();
-    public hltvPlayersCacheID: Collection<number, dbS.HltvPlayer> = new Collection();
 
     // Classes
     public commands: Collection<string, Command> = new Collection();
     public eventFiles: Collection<string, EventHandler> = new Collection();
     public cooldowns: Collection<string, Collection<string, number>> = new Collection();
-    public db!: MySQLClient;
     public localizationManager!: LocalizationManager;
     public configManager!: ConfigManager;
-    public cacheManager!: CacheManager;
     public browserService!: BrowserService;
 
     // Colors
@@ -58,10 +46,8 @@ export class BotClient extends Client {
 
         // Get the instances for singletons.
         this.browserService = BrowserService.getInstance();
-        this.db = MySQLClient.getInstance();
         this.localizationManager = LocalizationManager.getInstance(this);
-        this.configManager = ConfigManager.getInstance(this, this.db);
-        this.cacheManager = CacheManager.getInstance(this);
+        this.configManager = ConfigManager.getInstance(this);
 
         // Initialize required services.
         await this.browserService.launchBrowser();

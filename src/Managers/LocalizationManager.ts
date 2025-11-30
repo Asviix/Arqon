@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { BotClient } from '@/client/botClient';
 import { LocalizationKeys } from '@/locales/data/keys';
-import { Logger } from '@/utils/Logger';
+import { Logger } from '@/utils/logger';
 
 // 1. Updated Interface: Keys can be a simple string OR a function (for parameterized messages)
 export type LocalizationValue = string | ((...args: any[]) => string);

@@ -7,3 +7,4 @@ node_modules/
 dist/
 phpmyadmin/
 pma_themes/blueberry/
+/src/generated/prisma
