@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.0.4 - NEW DATE
+## 0.0.4 - 2025-12-01
+
+### New
+
+- The bot now uses Prisma to handle SQL queries for easier hanling. ([`#15`](https://github.com/Asviix/Arqon/issues/15))
 
 ### Changed
 
