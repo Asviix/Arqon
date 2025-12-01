@@ -1,6 +1,6 @@
 {
   "name": "arqon",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register src/index.ts",
@@ -13,10 +13,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.0.1",
+    "@prisma/client": "^7.0.1",
     "cheerio": "^1.1.2",
     "discord.js": "^14.24.0",
     "dotenv": "^17.2.3",
     "mysql2": "^3.15.3",
+    "prisma": "^7.0.1",
     "pupeteer": "^0.0.1",
     "puppeteer": "^24.28.0",
     "puppeteer-extra": "^3.3.6",

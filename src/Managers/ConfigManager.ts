@@ -1,133 +1,114 @@
-// src\Managers\ConfigManager.ts
+// src\managers\configManager.ts
 
-import { BotClient } from "@/client/botClient";
-import { GuildConfig, HltvPlayer, MySQLClient } from '@/database/mySQLClient';
-import { Logger } from "@/utils/logger";
-import * as mysql from 'mysql2/promise';
+import { BotClient } from '@/client/botClient';
+import * as db from '@/database/prismaClient';
+import * as dbI from '@prisma/client';
+import * as dbT from '@/types/dbTypes';
+import { Logger } from '@/utils/logger';
+import { Collection } from "discord.js";
+import { CacheManager } from "./cacheManager";
+
+interface DomainMap {
+    botLogs: dbI.BotLogs;
+    guildConfig: dbI.GuildConfig;
+    hltvPlayer: dbI.HltvPlayer;
+    hltvPlayers: dbI.HltvPlayer[];
+};
 
 export class ConfigManager {
-    private static instance: ConfigManager;
+    public static instance: ConfigManager;
     private client: BotClient;
-    private db: MySQLClient;
-
-    private constructor(client: BotClient, db: MySQLClient) {
-        this.client = client;
-        this.db = db;
+    private cache: CacheManager;
+    public caches = {
+        guildConfigs: new Collection<string, dbI.GuildConfig>,
+        hltvPlayersByNick: new Collection<string, string[]>,
+        hltvPlayersByID: new Collection<string, dbI.HltvPlayer>
     };
 
-    public static getInstance(client: BotClient, db: MySQLClient): ConfigManager {
+    private constructor(client: BotClient) {
+        this.client = client;
+        this.cache = CacheManager.getInstance(this.caches);
+    };
+
+    public static getInstance(client: BotClient): ConfigManager {
         if (!ConfigManager.instance) {
             Logger.debug('Creating ConfigManager instance...');
-            ConfigManager.instance = new ConfigManager(client, db);
+            ConfigManager.instance = new ConfigManager(client);
         };
         return ConfigManager.instance;
     };
 
-    public async initializeGuildConfig(guildId: string): Promise<GuildConfig> {
-        await this.db.query(
-            `INSERT INTO guild_configs (guild_id) VALUES (?)`, [guildId]
-        )
+    public async get<K extends keyof DomainMap>(
+        domain: K,
+        id: string | number
+    ): Promise<DomainMap[K] | null> {
 
-        const newConfig: GuildConfig = {
-            guild_id: guildId,
-            language_code: 'en-US',
-            joined_on: new Date().getTime()
+        if (domain === 'guildConfig') {
+            const guildId = String(id);
+
+            const cached = this.cache.get('guildConfigs', guildId);
+            if (cached) return cached as DomainMap[K];
+
+            const dbRes: dbT.queryResult<dbI.GuildConfig> = await db.getGuildConfig(guildId);
+            if (!dbRes.ok || !dbRes.value) return null;
+
+            this.cache.set('guildConfigs', guildId, dbRes.value);
+            return dbRes.value as DomainMap[K];
         };
 
-        return newConfig;
-    };
+        if (domain === 'hltvPlayers') {
+            const nick = String(id).toLowerCase();
 
-    public async getGuildConfig(guildId: string): Promise<GuildConfig> {
-        const rows = await this.db.query<mysql.RowDataPacket[]>(
-            `SELECT * FROM guild_configs WHERE guild_id = ?`,
-            [guildId]
-        );
-
-        if (rows && rows.length > 0) {
-            return rows[0] as GuildConfig;
-        };
-
-        try {
-            return await this.initializeGuildConfig(guildId);
-        } catch (error) {
-            Logger.error('CRITICAL DB ERROR!', error);
-            const newConfig: GuildConfig = {
-                guild_id: guildId,
-                language_code: 'en-US',
-                joined_on: new Date().getTime()
+            const ids = this.cache.get('hltvPlayersByNick', nick);
+            if (ids && ids.length > 0) {
+                const players = ids
+                    .map(id => this.cache.get('hltvPlayersByID', id))
+                    .filter((p): p is dbI.HltvPlayer => p !== undefined);
+                
+                    if (players.length > 0) {
+                        return players as DomainMap[K];
+                    };
             };
 
-            return newConfig;
-        };
-    };
+            const dbRes: dbT.queryResult<dbI.HltvPlayer[]> = await db.getHLTVPlayer(nick);
+            if (!dbRes.ok || !dbRes.value || dbRes.value.length === 0) {
+                return null;
+            };
 
-    public async getCachedGuildConfig(guildId: string): Promise<GuildConfig> {
-        const cachedConfig = this.client.guildConfigs.get(guildId);
+            const playerIds = dbRes.value.map(p => {
+                this.cache.set('hltvPlayersByID', p.player_id, p);
+                return p.player_id;
+            });
 
-        if (!cachedConfig) {
-            const newConfig = await this.getGuildConfig(guildId);
-            this.client.guildConfigs.set(guildId, newConfig);
-            return newConfig;
-        };
+            this.cache.set('hltvPlayersByNick', nick, playerIds);
 
-        return cachedConfig;
-    };
-
-    public async insertPlayerinHLTVDatabase(data: HltvPlayer): Promise<void> {
-        await this.db.query(
-            `INSERT INTO hltv_players_database 
-                (player_id, first_name, last_name, nickname, country)
-            VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                first_name = VALUES(first_name),
-                last_name = VALUES(last_name),
-                nickname = VALUES(nickname),
-                country = VALUES(country)`,
-            [data.player_id, data.first_name, data.last_name, data.nickname, data.country]
-        );
-    };
-
-    public async getHLTVPlayer(playerNick: string): Promise<HltvPlayer[] | null> {
-        const rows = await this.db.query<mysql.RowDataPacket[]>(
-            `SELECT * FROM hltv_players_database WHERE nickname LIKE ?`,
-            [`%${playerNick}%`]
-        );
-
-        if (rows && rows.length > 0) {
-            return rows as HltvPlayer[];
-        };
-
-        for (const player of rows as HltvPlayer[]) {
-            this.insertCachedHLTVPlayer(player);
+            return dbRes.value as DomainMap[K];
         };
 
         return null;
     };
 
-    private insertCachedHLTVPlayer(data: HltvPlayer): void {
-        const { player_id, nickname } = data;
+    public async set<K extends keyof DomainMap>(
+        domain: K,
+        id: string,
+        value?: DomainMap[K]
+    ): Promise<DomainMap[K] | void> {
 
-        this.client.hltvPlayerDBbyID.set(player_id, data);
-
-        const exist = this.client.hltvPlayerDBbyNick.get(nickname.toLowerCase());
-        if (exist) {
-            exist.push(player_id);
-        } else {
-            this.client.hltvPlayerDBbyNick.set(nickname.toLowerCase(), [player_id]);
+        if (domain === 'botLogs') {
+            await db.initBotLogs(String(id));
+            return;
         };
-    };
-
-    public async getCachedHLTVPlayer(playerNick: string): Promise<HltvPlayer[] | null> {
-        const ids = this.client.hltvPlayerDBbyNick.get(playerNick.toLowerCase());
-
-        if (!ids) {
-            return null;
+        
+        if (domain === 'guildConfig') {
+            const guild: dbT.queryResult<dbI.GuildConfig> = await db.setGuildConfig(id);
+            this.cache.setGuildConfig(guild.value as never as dbI.GuildConfig);
+            return guild.value as DomainMap[K];
         };
 
-        const players = ids
-            .map(id => this.client.hltvPlayerDBbyID.get(id))
-            .filter((p): p is HltvPlayer => p !== undefined);
-
-        return players.length > 0 ? players : null;
+        if (domain === 'hltvPlayer') {
+            const player: dbT.queryResult<dbI.HltvPlayer> = await db.setHLTVPlayer(value as never as dbI.HltvPlayer);
+            this.cache.setHLTVPlayer(value as never as dbI.HltvPlayer);
+            return player.value as DomainMap[K];
+        };
     };
 };

@@ -1,14 +1,13 @@
 // src\commands\hltv\player\stats\player_statsHandler.ts
 
 import { CommandContext } from "@/commands/baseCommand";
-import { HltvPlayer } from "@/database/mySQLClient";
 import * as cheerio from "cheerio";
 import { ActionRowBuilder, AttachmentBuilder, BaseMessageOptions, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction } from "discord.js";
 import { ElementHandle, HTTPResponse, Page } from "puppeteer";
 import sharp from "sharp";
 import { hltvRefs } from "./data/hltvRefs";
 import { statsData } from "./data/interfaces";
-import { readFileSync } from "fs";
+import * as dbI from '@prisma/client';
 
 export class player_statsHandler {
     private c: CommandContext
@@ -149,7 +148,7 @@ export class player_statsHandler {
         playerId = players[userResponse].player_id;
         playerName = players[userResponse].nickname;
 
-        const sanitizedNickname = playerName.replace(/\s+/g, '-');
+        const sanitizedNickname = playerName!.replace(/\s+/g, '-');
 
         let statsUrl: string = hltvRefs.STATS_URL
             .replace('[id]', playerId.toString())
@@ -174,27 +173,22 @@ export class player_statsHandler {
         return statsUrl;
     };
 
-    private async getPlayers(p: Page, query: string): Promise<HltvPlayer[] | void> {
-        const cachedPlayer = await this.c.client.configManager.getCachedHLTVPlayer(query);
-        if (cachedPlayer) {
-            return cachedPlayer
-        };
-
-        const dbPlayers = await this.c.client.configManager.getHLTVPlayer(query);
-        if (dbPlayers) {
-            return dbPlayers
+    private async getPlayers(p: Page, query: string): Promise<dbI.HltvPlayer[] | void> {
+        const cachedPlayers = await this.c.client.configManager.get('hltvPlayers', query);
+        if (cachedPlayers) {
+            return cachedPlayers
         };
 
         const players = await this.fetchPlayersFromHLTV(p, query)
 
         players.forEach(async (player) => {
-            await this.c.client.configManager.insertPlayerinHLTVDatabase(player);
+            await this.c.client.configManager.set('hltvPlayer', player.nickname as string, player);
         });
 
         return players;
     };
 
-    private async fetchPlayersFromHLTV(p: Page, query: string): Promise<HltvPlayer[]> {
+    private async fetchPlayersFromHLTV(p: Page, query: string): Promise<dbI.HltvPlayer[]> {
         await p.goto(`https://www.hltv.org/search?query=${query.toLowerCase()}`, {
             waitUntil: 'domcontentloaded',
             referer: 'https://www.hltv.org',
@@ -206,7 +200,7 @@ export class player_statsHandler {
         const searchField = $('div.search');
 
         const tables = searchField.find('table.table');
-        const players: HltvPlayer[] = [];
+        const players: dbI.HltvPlayer[] = [];
 
         tables.each((tableIndex, tableElement) => {
             const $table = $(tableElement);
@@ -234,7 +228,7 @@ export class player_statsHandler {
                 const href = $link.attr('href') || '';
                 const idMatch = href.match(/\/player\/(\d+)\//);
                 if (!idMatch) return; // skip if no player ID
-                const player_id = parseInt(idMatch[1], 10);
+                const player_id = idMatch[1];
 
                 const country = $link.find('img').attr('title') || '';
 
@@ -272,7 +266,7 @@ export class player_statsHandler {
         return players;
     };
 
-    private async handleComponents(players: HltvPlayer[]): Promise<BaseMessageOptions | number> {
+    private async handleComponents(players: dbI.HltvPlayer[]): Promise<BaseMessageOptions | number> {
         const rows = this.createActionRows(players);
         const embed = this.createComponentEmbed(players);
 
@@ -318,7 +312,7 @@ export class player_statsHandler {
         return index;
     };
 
-    private createActionRows(players: HltvPlayer[]): ActionRowBuilder<ButtonBuilder>[] {
+    private createActionRows(players: dbI.HltvPlayer[]): ActionRowBuilder<ButtonBuilder>[] {
         const rows: ActionRowBuilder<ButtonBuilder>[] = [];
         let currentRow = new ActionRowBuilder<ButtonBuilder>();
 
@@ -341,7 +335,7 @@ export class player_statsHandler {
         return rows;
     };
 
-    private createComponentEmbed(players: HltvPlayer[]): EmbedBuilder {
+    private createComponentEmbed(players: dbI.HltvPlayer[]): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('Select a player')
             .setColor(this.c.client.embedOrangeColor)

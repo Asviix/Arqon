@@ -29,7 +29,8 @@ export class ReadyHandler {
 
         const promises = [
             this._registerCommands(),
-            this._editPinnedMessage()
+            this._editPinnedMessage(),
+            this.c.configManager.set('botLogs', this.c.uuid)
         ];
 
         this._setActivity();
@@ -47,7 +48,7 @@ export class ReadyHandler {
 
     private async _registerCommands(): Promise<void> {
         const commandData: ApplicationCommandDataResolvable[] = Array.from(this.c.commands.values()).map(c => c.commandData);
-        Logger.command(`Registering ${commandData.length} guild commands...`)
+        Logger.debug(`Registering ${commandData.length} guild commands...`)
 
         let ca: ClientApplication | null = this.c.application;
         if (!ca) {

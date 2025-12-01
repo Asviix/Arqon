@@ -15,8 +15,8 @@ export default class ReadyEvent extends EventHandler {
         await h.main();
         h.dispose();
 
-        setInterval(() => {
+        /*setInterval(() => {
             client.db.syncSessionCounters();
-        }, SYNC_INTERVAL_MS);
+        }, SYNC_INTERVAL_MS);*/
     };
 };

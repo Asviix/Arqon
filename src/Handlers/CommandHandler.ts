@@ -39,7 +39,7 @@ export class CommandHandler {
                     if (CommandClass && typeof CommandClass === 'function') {
                         const command: Command = new CommandClass();
                         this.client.commands.set(command.name, command);
-                        Logger.command(`Command loaded: ${command.name}`);
+                        Logger.debug(`Command loaded: ${command.name}`);
                     };
                 };
             };

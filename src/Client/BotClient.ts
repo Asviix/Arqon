@@ -1,7 +1,6 @@
 // src\Client\BotClient.ts
 
 import { Command } from '@/commands/baseCommand';
-import { GuildConfig, HltvPlayer, MySQLClient } from '@/database/mySQLClient';
 import { EventHandler } from '@/events/baseEvent';
 import { ConfigManager } from '@/managers/configManager';
 import { LocaleStrings, LocalizationManager } from '@/managers/localizationManager';
@@ -10,23 +9,16 @@ import { Logger } from '@/utils/logger';
 import { Client, ClientOptions, Collection, ColorResolvable } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * The BotClient class that extends client.
- */
 export class BotClient extends Client {
     private static instance: BotClient;
 
     // Interfaces
     public locales: LocaleStrings = {};
-    public guildConfigs: Collection<string, GuildConfig> = new Collection();
-    public hltvPlayerDBbyID: Collection<number, HltvPlayer> = new Collection();
-    public hltvPlayerDBbyNick: Collection<string, number[]> = new Collection();
 
     // Classes
     public commands: Collection<string, Command> = new Collection();
     public eventFiles: Collection<string, EventHandler> = new Collection();
     public cooldowns: Collection<string, Collection<string, number>> = new Collection();
-    public db!: MySQLClient;
     public localizationManager!: LocalizationManager;
     public configManager!: ConfigManager;
     public browserService!: BrowserService;
@@ -37,11 +29,6 @@ export class BotClient extends Client {
     // Misc
     public isProd: boolean = process.argv.includes('--env=production');
     public uuid: string = uuidv4();
-    public sessionCounters = {
-        commandsRan: 0,
-        warningsLogged: 0,
-        errorsLogged: 0
-    };
 
     private constructor(options: ClientOptions) {
         super(options);
@@ -59,15 +46,13 @@ export class BotClient extends Client {
 
         // Get the instances for singletons.
         this.browserService = BrowserService.getInstance();
-        this.db = MySQLClient.getInstance(this);
         this.localizationManager = LocalizationManager.getInstance(this);
-        this.configManager = ConfigManager.getInstance(this, this.db);
+        this.configManager = ConfigManager.getInstance(this);
 
         // Initialize required services.
         await this.browserService.launchBrowser();
-        await this.db.initializeSchema();
 
-        Logger.init(this)
+        Logger.init(this);
 
         this.locales = await this.localizationManager.loadLocales();
 
