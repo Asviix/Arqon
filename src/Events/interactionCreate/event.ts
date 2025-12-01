@@ -22,7 +22,6 @@ export default class InteractionCreateEvent extends EventHandler {
         // KEEP AS PROOF OF CONCEPT FOR HELP COMMAND HANDLING
 
         const h = new InteractionCreateHandler(client, interaction);
-
         const handlerResult = await h.main();
 
         if (!(interaction instanceof ChatInputCommandInteraction)) {

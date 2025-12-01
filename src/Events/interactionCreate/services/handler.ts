@@ -1,6 +1,6 @@
 // src\events\interactionCreate\services\handler.ts
 
-import { ChatInputCommandInteraction, Collection, Interaction, InteractionReplyOptions } from "discord.js";
+import { ChatInputCommandInteraction, Collection, Interaction, InteractionReplyOptions, MessageFlags } from "discord.js";
 import { BotClient } from "@/client/botClient";
 import { BoundTranslatorObject, createTranslator } from "@/utils/translatorHelper";
 import { Command, CommandContext } from "@/commands/baseCommand";
@@ -28,7 +28,12 @@ export class InteractionCreateHandler {
 
         if (typeof this.i.guildId === 'string') {
             const guild = await this.c.configManager.get('guildConfig', this.i.guildId);
-            if (guild) languageCode = guild.language_code;
+            if (guild) {
+                languageCode = guild.language_code;
+            } else {
+                const newGuild = await this.c.configManager.set('guildConfig', this.i.guildId);
+                languageCode = newGuild?.language_code ?? DEFAULT_LOCALE;
+            };
         };
 
         const _ = createTranslator(this.c, languageCode);
@@ -90,7 +95,7 @@ export class InteractionCreateHandler {
                         seconds: remaining.toString(),
                         commandName: i.commandName
                     }),
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
                 };
             };
         };
@@ -105,7 +110,7 @@ export class InteractionCreateHandler {
             Logger.error(`Command not found: /${i.commandName}`, new Error());
             return {
                 content: _.BASE_ERROR_COMMAND_NOT_FOUND(),
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             };
         };
 

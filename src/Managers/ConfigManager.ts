@@ -1,9 +1,8 @@
-// src\Managers\ConfigManager.ts
+// src\managers\configManager.ts
 
 import { BotClient } from '@/client/botClient';
 import * as db from '@/database/prismaClient';
-import * as dbI from '@/interfaces/dbConfig';
-import * as dbS from '@/interfaces/shared';
+import * as dbI from '@prisma/client';
 import * as dbT from '@/types/dbTypes';
 import { Logger } from '@/utils/logger';
 import { Collection } from "discord.js";
@@ -12,8 +11,8 @@ import { CacheManager } from "./cacheManager";
 interface DomainMap {
     botLogs: dbI.BotLogs;
     guildConfig: dbI.GuildConfig;
-    hltvPlayer: dbS.HltvPlayer;
-    hltvPlayers: dbS.HltvPlayer[];
+    hltvPlayer: dbI.HltvPlayer;
+    hltvPlayers: dbI.HltvPlayer[];
 };
 
 export class ConfigManager {
@@ -22,13 +21,13 @@ export class ConfigManager {
     private cache: CacheManager;
     public caches = {
         guildConfigs: new Collection<string, dbI.GuildConfig>,
-        hltvPlayersByNick: new Collection<string, number[]>,
-        hltvPlayersByID: new Collection<number, dbS.HltvPlayer>
+        hltvPlayersByNick: new Collection<string, string[]>,
+        hltvPlayersByID: new Collection<string, dbI.HltvPlayer>
     };
 
     private constructor(client: BotClient) {
         this.client = client;
-        this.cache = CacheManager.getInstance(this.client);
+        this.cache = CacheManager.getInstance(this.caches);
     };
 
     public static getInstance(client: BotClient): ConfigManager {
@@ -64,14 +63,14 @@ export class ConfigManager {
             if (ids && ids.length > 0) {
                 const players = ids
                     .map(id => this.cache.get('hltvPlayersByID', id))
-                    .filter((p): p is dbS.HltvPlayer => p !== undefined);
+                    .filter((p): p is dbI.HltvPlayer => p !== undefined);
                 
                     if (players.length > 0) {
                         return players as DomainMap[K];
                     };
             };
 
-            const dbRes: dbT.queryResult<dbS.HltvPlayer[]> = await db.getHLTVPlayer(nick);
+            const dbRes: dbT.queryResult<dbI.HltvPlayer[]> = await db.getHLTVPlayer(nick);
             if (!dbRes.ok || !dbRes.value || dbRes.value.length === 0) {
                 return null;
             };
@@ -91,8 +90,8 @@ export class ConfigManager {
 
     public async set<K extends keyof DomainMap>(
         domain: K,
-        id: string | number,
-        value?: K
+        id: string,
+        value?: DomainMap[K]
     ): Promise<DomainMap[K] | void> {
 
         if (domain === 'botLogs') {
@@ -101,21 +100,15 @@ export class ConfigManager {
         };
         
         if (domain === 'guildConfig') {
-            const guildId = String(id);
-
-            const guild: dbT.queryResult<dbI.GuildConfig> = await db.setGuildConfig(guildId);
+            const guild: dbT.queryResult<dbI.GuildConfig> = await db.setGuildConfig(id);
             this.cache.setGuildConfig(guild.value as never as dbI.GuildConfig);
             return guild.value as DomainMap[K];
         };
 
         if (domain === 'hltvPlayer') {
-            const player: dbT.queryResult<dbS.HltvPlayer> = await db.setHLTVPlayer(value as never as dbS.HltvPlayer);
-            this.cache.setHLTVPlayer(value as never as dbS.HltvPlayer);
+            const player: dbT.queryResult<dbI.HltvPlayer> = await db.setHLTVPlayer(value as never as dbI.HltvPlayer);
+            this.cache.setHLTVPlayer(value as never as dbI.HltvPlayer);
             return player.value as DomainMap[K];
         };
-
-        if (domain === 'hltvPlayers') {
-            
-        }
     };
 };
