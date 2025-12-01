@@ -5,16 +5,16 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - '3306:3306'
     volumes:
       - dbdata:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -hdb -u${DB_ROOT_USER} -p${DB_PASSWORD} > /dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -hdb -u${MYSQL_ROOT_USER} -p${MYSQL_ROOT_PASSWORD} > /dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -30,8 +30,8 @@ services:
       PGID: 1000
       PMA_HOST: db
       PMA_PORT: 3306
-      PMA_USER: ${DB_ROOT_USER}
-      PMA_PASSWORD: ${DB_ROOT_PASSWORD}
+      PMA_USER: ${MYSQL_ROOT_USER}
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
