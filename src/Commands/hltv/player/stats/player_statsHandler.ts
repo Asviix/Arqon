@@ -1,13 +1,13 @@
 // src\commands\hltv\player\stats\player_statsHandler.ts
 
 import { CommandContext } from "@/commands/baseCommand";
+import * as dbI from '@prisma/client';
 import * as cheerio from "cheerio";
 import { ActionRowBuilder, AttachmentBuilder, BaseMessageOptions, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction } from "discord.js";
 import { ElementHandle, HTTPResponse, Page } from "puppeteer";
 import sharp from "sharp";
 import { hltvRefs } from "./data/hltvRefs";
 import { statsData } from "./data/interfaces";
-import * as dbI from '@prisma/client';
 
 export class player_statsHandler {
     private c: CommandContext

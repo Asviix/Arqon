@@ -1,6 +1,6 @@
 // src\Utils\BrowserService.ts
 
-import { Browser, Page } from "puppeteer";
+import { Browser, executablePath, Page } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { Logger } from "@/utils/logger";
@@ -23,13 +23,17 @@ export class BrowserService {
     };
 
     public async launchBrowser(): Promise<void> {
+        const args = process.argv;
+        const isProduction = args.includes('--env=production');
+
         if (!this.browser) {
         Logger.info('Starting headless browser...')
             this.browser = await puppeteer.launch({
                 headless: true,
                 args: ['--no-sandbox'],
                 protocolTimeout: 180000,
-                defaultViewport: { width: 1920, height: 1080}
+                defaultViewport: { width: 1920, height: 1080},
+                executablePath: isProduction ? process.env.CHROMIUM_PATH : undefined
             });
         };
     };

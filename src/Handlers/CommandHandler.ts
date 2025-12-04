@@ -11,7 +11,7 @@ const expectedExtension = isTypeScriptEnv ? '.ts' : '.js';
 
 export class CommandHandler {
     private client: BotClient;
-    private commandsPath: string = path.join(__dirname, '..', 'Commands');
+    private commandsPath: string = path.join(__dirname, '..', 'commands');
 
     constructor(client: BotClient) {
         this.client = client;

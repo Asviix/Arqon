@@ -3,6 +3,7 @@
 .markdownlint.jsonc
 commands.txt
 logs/
+generated/
 node_modules/
 dist/
 phpmyadmin/

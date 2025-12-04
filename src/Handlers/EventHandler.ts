@@ -11,7 +11,7 @@ const expectedExtension = isTypeScriptEnv ? '.ts' : '.js';
 
 export class EventLoadHandler {
     private client: BotClient;
-    private eventPath: string = path.join(__dirname, '..', 'Events');
+    private eventPath: string = path.join(__dirname, '..', 'events');
 
     constructor(client: BotClient) {
         this.client = client;

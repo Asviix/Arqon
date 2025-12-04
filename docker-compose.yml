@@ -43,11 +43,16 @@ services:
     build: .
     command: "npm run start"
     environment:
+      CLIENT_ID: ${CLIENT_ID}
+      DEV_DISCORD_ID: ${DEV_DISCORD_ID}
+      DEV_LOGS_CHANNEL: ${DEV_LOGS_CHANNEL}
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       DB_HOST: db
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
+      DATABASE_URL: ${DATABASE_DOCKER_URL}
+      CHROMIUM_PATH: "/usr/bin/chromium"
     depends_on:
       db:
         condition: service_healthy

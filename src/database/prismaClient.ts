@@ -4,8 +4,8 @@ import * as dbE from '@/errors/databaseErrors';
 import * as dbI from '@prisma/client';
 import * as dbT from '@/types/dbTypes';
 import { Logger } from '@/utils/logger';
-import { PrismaClient } from '@prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaClient } from '@prisma/client';
 
 const adapter = new PrismaMariaDb({
     host: 'localhost',

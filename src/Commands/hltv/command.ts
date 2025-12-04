@@ -47,7 +47,7 @@ export default class hltvCommand extends Command {
                     .setRequired(false)
                 )
             )
-        );
+        ) as SlashCommandBuilder
     
     public async execute(c: CommandContext) {
       const payload = await runMethod(c);

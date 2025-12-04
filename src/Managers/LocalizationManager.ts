@@ -34,7 +34,7 @@ export class LocalizationManager {
     public async loadLocales(): Promise<LocaleStrings> {
         Logger.debug('Loading locales...');
         
-        const localesPath = path.resolve(__dirname, '..', 'Locales', 'locales');
+        const localesPath = path.resolve(__dirname, '..', 'locales', 'locales');
         const locales: LocaleStrings = {};
 
         try {
