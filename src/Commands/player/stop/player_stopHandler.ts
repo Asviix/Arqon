@@ -3,6 +3,7 @@
 import { CommandContext } from "@/commands/baseCommand";
 import { BaseMessageOptions } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
+import * as dsp from 'discord-player';
 
 export class player_stopHandler {
     private c: CommandContext
@@ -20,7 +21,7 @@ export class player_stopHandler {
             };
         };
 
-        const connection = getVoiceConnection(this.c.interaction.guildId);
+        const connection = dsp.useMainPlayer();
 
         if (!connection) {
             return payload = {

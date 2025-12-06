@@ -28,6 +28,10 @@ export default class playerCommand extends Command {
     
     public async execute(c: CommandContext) {
         const payload = await runMethod(c);
-        c.interaction.reply(payload);
+        if (c.interaction.replied || c.interaction.deferred) {
+            c.interaction.editReply(payload);
+        } else {
+            c.interaction.reply(payload);
+        };
     };
 };

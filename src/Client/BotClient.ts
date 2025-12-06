@@ -6,8 +6,11 @@ import { ConfigManager } from '@/managers/configManager';
 import { LocaleStrings, LocalizationManager } from '@/managers/localizationManager';
 import { BrowserService } from '@/utils/browserService';
 import { Logger } from '@/utils/logger';
+import * as dspe from '@discord-player/extractor';
+import * as dsp from 'discord-player';
 import { Client, ClientOptions, Collection, ColorResolvable } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
+import { YoutubeSabrExtractor } from 'discord-player-googlevideo';
 
 export class BotClient extends Client {
     private static instance: BotClient;
@@ -48,6 +51,12 @@ export class BotClient extends Client {
         this.browserService = BrowserService.getInstance();
         this.localizationManager = LocalizationManager.getInstance(this);
         this.configManager = ConfigManager.getInstance(this);
+
+        const player = new dsp.Player(this);
+
+        await player.extractors.register(YoutubeSabrExtractor, {});
+        await player.extractors.loadMulti(dspe.DefaultExtractors);
+        
 
         // Initialize required services.
         await this.browserService.launchBrowser();

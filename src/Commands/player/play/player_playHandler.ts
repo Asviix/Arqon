@@ -1,8 +1,10 @@
 // src\commands\player\play\player_playHandler.ts
 
 import { CommandContext } from "@/commands/baseCommand";
-import { joinVoiceChannel } from "@discordjs/voice";
-import { BaseMessageOptions, GuildMember, VoiceBasedChannel } from "discord.js";
+import { Logger } from "@/utils/logger";
+import * as dsp from 'discord-player';
+import { YoutubeSabrExtractor } from "discord-player-googlevideo";
+import { BaseMessageOptions, GuildMember } from "discord.js";
 
 export class player_playHandler {
     private c: CommandContext
@@ -22,14 +24,24 @@ export class player_playHandler {
             return { content: `You are not in a voice channel!` }
         };
 
-        const connection = joinVoiceChannel({
-            channelId: voiceChannel.id,
-            guildId: voiceChannel.guildId,
-            adapterCreator: voiceChannel.guild.voiceAdapterCreator
-        });
+        try {
+            const player = dsp.useMainPlayer();
 
-        return payload = {
-            content: `Joined voice channel!`
+            const { track } = await player.play(voiceChannel, this.song, {
+                nodeOptions: {
+                    metadata: this.c.interaction
+                },
+                requestedBy: this.c.interaction.user
+            });
+
+            return payload = {
+                content: `Playing:\n${track.title} by ${track.author} on ${track.source}.`
+            };
+        } catch (e) {
+            Logger.error('Failed to play audio:', e);
+            return payload = {
+                content: `❌ Could not start playback (Check logs for error).`
+            };
         };
     };
 

@@ -13,6 +13,8 @@ export async function runMethod(c: CommandContext): Promise<BaseMessageOptions> 
     };
 
     if (subCommand === 'play') {
+        await c.interaction.deferReply();
+
         const h = new player_playHandler(c);
         
         payload = await h.main()
